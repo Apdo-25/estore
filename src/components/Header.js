@@ -48,11 +48,14 @@ const Header = () => {
             fontWeight="bold"
             letterSpacing="tight"
             as={"a"}
-            href="#"
+            href="/"
           >
             EStore
           </Text>
         </Flex>
+        <Text fontSize={"m"} fontWeight={600} as={"a"} href={"products"}>
+          All Products
+        </Text>
 
         {/* Mobile Menu Icon */}
         <Box display={{ base: "block", md: "none" }}>
@@ -68,7 +71,7 @@ const Header = () => {
           flex={{ base: 2, md: 1 }}
           justify={"flex-end"}
           direction={"row"}
-          spacing={2}
+          spacing={4}
           align="center"
           display={{ base: "none", md: "flex" }}
         >

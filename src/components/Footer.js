@@ -13,12 +13,12 @@ import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 const Logo = (props) => {
   return (
     <Text
-      fontFamily={"Logo"}
+      fontFamily={"heading"}
       fontSize="lg"
       fontWeight="bold"
       letterSpacing="tight"
       as={"a"}
-      href="#"
+      href="/"
     >
       EStore
     </Text>
