@@ -18,7 +18,7 @@ import {
   HamburgerIcon,
   CloseIcon,
 } from "@chakra-ui/icons";
-
+import { useRouter } from "next/router";
 import { FiShoppingCart } from "react-icons/fi";
 
 import Link from "next/link";
@@ -26,6 +26,11 @@ import Link from "next/link";
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -57,7 +62,7 @@ const Header = () => {
             </Text>
           </Link>
         </Flex>
-        <Link href={"products"}>
+        <Link href={"products"} onClick={closeMobileMenu}>
           <Text fontSize={"m"} fontWeight={600}>
             All Products
           </Text>
@@ -82,23 +87,27 @@ const Header = () => {
           display={{ base: "none", md: "flex" }}
         >
           {/* Search Bar */}
-          <Input
-            variant="filled"
-            size="sm"
-            placeholder="Search..."
-            rounded="full"
-            maxW="xs"
-          />
-          <Button
-            leftIcon={<SearchIcon />}
-            fontSize={"sm"}
-            fontWeight={500}
-            variant={"outline"}
-            rounded="full"
-          >
-            Search
-          </Button>
+          {router.pathname === "/products" && (
+            <>
+              <Input
+                variant="filled"
+                size="sm"
+                placeholder="Search..."
+                rounded="full"
+                maxW="xs"
+              />
 
+              <Button
+                leftIcon={<SearchIcon />}
+                fontSize={"sm"}
+                fontWeight={500}
+                variant={"outline"}
+                rounded="full"
+              >
+                Search
+              </Button>
+            </>
+          )}
           {/* Other Menu Items */}
           <Link href={"/login"}>
             <Button
@@ -129,35 +138,42 @@ const Header = () => {
       </Flex>
 
       {/* Mobile Menu Content */}
-      {isMobileMenuOpen && (
-        <VStack p={2} spacing={2} align="flex-start">
-          <Link href={"/login"}>
-            <Button
-              fontSize={"sm"}
-              fontWeight={600}
-              color={"white"}
-              bg={"gray.600"}
-              rounded="full"
-              w="100%"
-              textAlign="left"
-            >
-              Sign in
-            </Button>
-          </Link>
-
-          <Button
-            onClick={toggleColorMode}
-            fontSize={"sm"}
-            variant={"ghost"}
-            leftIcon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-            rounded="full"
+      {/* Mobile Menu */}
+      <Box display={{ base: "block", md: "none" }}>
+        {isMobileMenuOpen && (
+          <VStack
+            p={2}
+            spacing={2}
+            align="center"
             w="100%"
-            textAlign="left"
+            onClick={closeMobileMenu}
           >
-            {colorMode === "light" ? "Dark" : "Light"} Mode
-          </Button>
-        </VStack>
-      )}
+            <Link href="/cart">
+              <Button leftIcon={<FiShoppingCart />}>Cart</Button>
+            </Link>
+            <Link href="/login">
+              <Button
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"gray.600"}
+                rounded="full"
+              >
+                Sign in
+              </Button>
+            </Link>
+            <Button
+              onClick={toggleColorMode}
+              fontSize={"sm"}
+              variant={"ghost"}
+              leftIcon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+              rounded="full"
+            >
+              {colorMode === "light" ? "Dark" : "Light"} Mode
+            </Button>
+          </VStack>
+        )}
+      </Box>
     </Box>
   );
 };
