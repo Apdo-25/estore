@@ -19,6 +19,10 @@ import {
   CloseIcon,
 } from "@chakra-ui/icons";
 
+import { FiShoppingCart } from "react-icons/fi";
+
+import Link from "next/link";
+
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -42,20 +46,22 @@ const Header = () => {
         justify="space-between"
       >
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Text
-            fontFamily={"heading"}
-            fontSize="lg"
-            fontWeight="bold"
-            letterSpacing="tight"
-            as={"a"}
-            href="/"
-          >
-            EStore
-          </Text>
+          <Link href={"/"}>
+            <Text
+              fontFamily={"heading"}
+              fontSize="lg"
+              fontWeight="bold"
+              letterSpacing="tight"
+            >
+              EStore
+            </Text>
+          </Link>
         </Flex>
-        <Text fontSize={"m"} fontWeight={600} as={"a"} href={"products"}>
-          All Products
-        </Text>
+        <Link href={"products"}>
+          <Text fontSize={"m"} fontWeight={600}>
+            All Products
+          </Text>
+        </Link>
 
         {/* Mobile Menu Icon */}
         <Box display={{ base: "block", md: "none" }}>
@@ -94,17 +100,22 @@ const Header = () => {
           </Button>
 
           {/* Other Menu Items */}
-          <Button
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"gray.600"}
-            as={"a"}
-            href={"login"}
-            rounded="full"
-          >
-            Sign in
-          </Button>
+          <Link href={"/login"}>
+            <Button
+              fontSize={"sm"}
+              fontWeight={600}
+              color={"white"}
+              bg={"gray.600"}
+              rounded="full"
+            >
+              Sign in
+            </Button>
+          </Link>
+
+          <Link href="/cart">
+            <Button leftIcon={<FiShoppingCart />}>Cart</Button>
+          </Link>
+
           <Button
             onClick={toggleColorMode}
             fontSize={"sm"}
@@ -120,19 +131,20 @@ const Header = () => {
       {/* Mobile Menu Content */}
       {isMobileMenuOpen && (
         <VStack p={2} spacing={2} align="flex-start">
-          <Button
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"gray.600"}
-            as={"a"}
-            href={"login"}
-            rounded="full"
-            w="100%"
-            textAlign="left"
-          >
-            Sign in
-          </Button>
+          <Link href={"/login"}>
+            <Button
+              fontSize={"sm"}
+              fontWeight={600}
+              color={"white"}
+              bg={"gray.600"}
+              rounded="full"
+              w="100%"
+              textAlign="left"
+            >
+              Sign in
+            </Button>
+          </Link>
+
           <Button
             onClick={toggleColorMode}
             fontSize={"sm"}
