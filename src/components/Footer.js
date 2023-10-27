@@ -9,19 +9,20 @@ import {
   VisuallyHidden,
 } from "@chakra-ui/react";
 import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import Link from "next/link";
 
 const Logo = (props) => {
   return (
-    <Text
-      fontFamily={"heading"}
-      fontSize="lg"
-      fontWeight="bold"
-      letterSpacing="tight"
-      as={"a"}
-      href="/"
-    >
-      EStore
-    </Text>
+    <Link href="/" passHref>
+      <Text
+        fontFamily={"heading"}
+        fontSize="lg"
+        fontWeight="bold"
+        letterSpacing="tight"
+      >
+        EStore
+      </Text>
+    </Link>
   );
 };
 const SocialButton = ({ children, label, href }) => {

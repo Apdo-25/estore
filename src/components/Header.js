@@ -17,6 +17,7 @@ import {
   SearchIcon,
   HamburgerIcon,
   CloseIcon,
+  AtSignIcon,
 } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { FiShoppingCart } from "react-icons/fi";
@@ -86,28 +87,6 @@ const Header = () => {
           align="center"
           display={{ base: "none", md: "flex" }}
         >
-          {/* Search Bar */}
-          {router.pathname === "/products" && (
-            <>
-              <Input
-                variant="filled"
-                size="sm"
-                placeholder="Search..."
-                rounded="full"
-                maxW="xs"
-              />
-
-              <Button
-                leftIcon={<SearchIcon />}
-                fontSize={"sm"}
-                fontWeight={500}
-                variant={"outline"}
-                rounded="full"
-              >
-                Search
-              </Button>
-            </>
-          )}
           {/* Other Menu Items */}
           <Link href={"/login"}>
             <Button
@@ -116,6 +95,7 @@ const Header = () => {
               color={"white"}
               bg={"gray.600"}
               rounded="full"
+              icon={AtSignIcon}
             >
               Sign in
             </Button>

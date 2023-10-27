@@ -2,8 +2,9 @@ import { Box } from "@chakra-ui/react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGrid } from "@/components/ProductGrid";
 import { products } from "@/utils/data";
+import SearchBar from "@/components/SearchBar";
 
-const Products = () => {
+const AllProducts = () => {
   return (
     <Box
       mx="auto"
@@ -18,6 +19,7 @@ const Products = () => {
         lg: "12",
       }}
     >
+      <SearchBar />
       <ProductGrid>
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -27,4 +29,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default AllProducts;

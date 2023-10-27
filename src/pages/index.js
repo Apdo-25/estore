@@ -1,14 +1,9 @@
-import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import { Container } from "@chakra-ui/react";
-
-const inter = Inter({ subsets: ["latin"] });
+import Hero from "@/components/Hero";
 
 export default function Home() {
   return (
     <>
-      <Container>Hello world</Container>
+      <Hero />
     </>
   );
 }
