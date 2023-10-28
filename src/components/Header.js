@@ -10,6 +10,12 @@ import {
   useColorMode,
   useColorModeValue,
   IconButton,
+  Slide,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  Icon,
 } from "@chakra-ui/react";
 import {
   MoonIcon,
@@ -20,7 +26,7 @@ import {
   AtSignIcon,
 } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiShoppingCart, FiUser } from "react-icons/fi";
 
 import Link from "next/link";
 
@@ -59,13 +65,14 @@ const Header = () => {
               fontWeight="bold"
               letterSpacing="tight"
             >
-              EStore
+              Timeless Watches
             </Text>
           </Link>
         </Flex>
+
         <Link href={"products"} onClick={closeMobileMenu}>
           <Text fontSize={"m"} fontWeight={600}>
-            All Products
+            Browse Watches
           </Text>
         </Link>
 
@@ -118,41 +125,50 @@ const Header = () => {
       </Flex>
 
       {/* Mobile Menu Content */}
-      {/* Mobile Menu */}
       <Box display={{ base: "block", md: "none" }}>
-        {isMobileMenuOpen && (
-          <VStack
-            p={2}
-            spacing={2}
-            align="center"
-            w="100%"
-            onClick={closeMobileMenu}
+        <Modal isOpen={isMobileMenuOpen} onClose={closeMobileMenu} size="full">
+          <ModalOverlay />
+          <ModalContent
+            mt={0}
+            mb={0}
+            ml={0}
+            rounded="none"
+            bg={useColorModeValue("white", "gray.800")}
           >
-            <Link href="/cart">
-              <Button leftIcon={<FiShoppingCart />}>Cart</Button>
-            </Link>
-            <Link href="/login">
+            <ModalCloseButton />
+            <VStack p={4} spacing={4} align="start" w="100%">
+              <Link href="/cart" onClick={closeMobileMenu}>
+                <Button
+                  variant="ghost"
+                  leftIcon={<FiShoppingCart />}
+                  w="100%"
+                  justifyContent="flex-start"
+                >
+                  Cart
+                </Button>
+              </Link>
+              <Link href="/login" onClick={closeMobileMenu}>
+                <Button
+                  variant="ghost"
+                  leftIcon={<Icon as={FiUser} />}
+                  w="100%"
+                  justifyContent="flex-start"
+                >
+                  Sign in
+                </Button>
+              </Link>
               <Button
-                fontSize={"sm"}
-                fontWeight={600}
-                color={"white"}
-                bg={"gray.600"}
-                rounded="full"
+                onClick={toggleColorMode}
+                variant="ghost"
+                leftIcon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                w="100%"
+                justifyContent="flex-start"
               >
-                Sign in
+                {colorMode === "light" ? "Dark" : "Light"} Mode
               </Button>
-            </Link>
-            <Button
-              onClick={toggleColorMode}
-              fontSize={"sm"}
-              variant={"ghost"}
-              leftIcon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              rounded="full"
-            >
-              {colorMode === "light" ? "Dark" : "Light"} Mode
-            </Button>
-          </VStack>
-        )}
+            </VStack>
+          </ModalContent>
+        </Modal>
       </Box>
     </Box>
   );

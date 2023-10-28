@@ -20,7 +20,7 @@ const Logo = (props) => {
         fontWeight="bold"
         letterSpacing="tight"
       >
-        EStore
+        Timeless Watches
       </Text>
     </Link>
   );
