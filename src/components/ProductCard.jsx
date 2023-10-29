@@ -32,7 +32,7 @@ export const ProductCard = (props) => {
     >
       <Box position="relative">
         <AspectRatio ratio={4 / 3}>
-          <Link href={`/product/${product.id}`} passHref>
+          <Link href={`/Product/${product.id}`} passHref>
             <Skeleton
               isLoaded={!!imageUrl}
               borderRadius={8}

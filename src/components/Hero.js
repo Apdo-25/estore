@@ -60,7 +60,7 @@ const Hero = () => {
             size="md"
             rightIcon={<Icon as={FaArrowRight} />}
           >
-            <Link href={"/product/Products"} passHref>
+            <Link href={"/Product/AllProducts"} passHref>
               Browse Our Watches
             </Link>
           </Button>

@@ -70,7 +70,7 @@ const Header = () => {
           </Link>
         </Flex>
 
-        <Link href={"/product/Products"} onClick={closeMobileMenu}>
+        <Link href={"/Product/AllProducts"} onClick={closeMobileMenu}>
           <Text fontSize={"m"} fontWeight={600}>
             Browse Watches
           </Text>
