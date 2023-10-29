@@ -3,8 +3,6 @@ import {
   Box,
   Button,
   HStack,
-  Image,
-  Link,
   Skeleton,
   Stack,
   Text,
@@ -14,9 +12,16 @@ import { Rating } from "./Rating";
 import { FavouriteButton } from "./FavouriteButton";
 import { PriceTag } from "./PriceTag";
 
+import Image from "next/image";
+import Link from "next/link";
+import { data } from "@/utils/data";
+import ProductBadge from "./ProductBadge";
+
 export const ProductCard = (props) => {
-  const { product, rootProps } = props;
-  const { name, imageUrl, price, salePrice, rating } = product;
+  //find data
+  const { product } = props;
+  const { name, imageUrl, price, salePrice, rating, flag } = product;
+
   return (
     <Stack
       spacing={{
@@ -24,20 +29,26 @@ export const ProductCard = (props) => {
         md: "5",
       }}
       maxW="300px"
-      {...rootProps}
     >
       <Box position="relative">
         <AspectRatio ratio={4 / 3}>
-          <Image
-            src={imageUrl}
-            alt={name}
-            draggable="false"
-            fallback={<Skeleton />}
-            borderRadius={{
-              base: "md",
-              md: "xl",
-            }}
-          />
+          <Link href={`/product/${product.id}`} passHref>
+            <Skeleton
+              isLoaded={!!imageUrl}
+              borderRadius={8}
+              width={"1200"}
+              height={"900"}
+            />
+            <ProductBadge flag={flag} />
+            <Image
+              src={imageUrl}
+              alt={name}
+              draggable="false"
+              fallback={<Skeleton />}
+              width={"1200"}
+              height={"900"}
+            />
+          </Link>
         </AspectRatio>
         <FavouriteButton
           position="absolute"

@@ -70,7 +70,7 @@ const Header = () => {
           </Link>
         </Flex>
 
-        <Link href={"products"} onClick={closeMobileMenu}>
+        <Link href={"/product/Products"} onClick={closeMobileMenu}>
           <Text fontSize={"m"} fontWeight={600}>
             Browse Watches
           </Text>
@@ -94,6 +94,10 @@ const Header = () => {
           align="center"
           display={{ base: "none", md: "flex" }}
         >
+          <Link href="/cart">
+            <Button leftIcon={<FiShoppingCart />}>Cart</Button>
+          </Link>
+
           {/* Other Menu Items */}
           <Link href={"/login"}>
             <Button
@@ -106,10 +110,6 @@ const Header = () => {
             >
               Sign in
             </Button>
-          </Link>
-
-          <Link href="/cart">
-            <Button leftIcon={<FiShoppingCart />}>Cart</Button>
           </Link>
 
           <Button

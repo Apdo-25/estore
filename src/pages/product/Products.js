@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGrid } from "@/components/ProductGrid";
-import { products } from "@/utils/data";
+import { data } from "@/utils/data";
 import SearchBar from "@/components/SearchBar";
 
 const AllProducts = () => {
@@ -21,7 +21,7 @@ const AllProducts = () => {
     >
       <SearchBar />
       <ProductGrid>
-        {products.map((product) => (
+        {data.products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </ProductGrid>

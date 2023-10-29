@@ -5,16 +5,14 @@ import Header from "./Header";
 
 const Layout = ({ children }) => {
   return (
-    <Flex direction="column" minHeight="100vh">
+    <Flex minH="100vh" direction="column" mx="auto">
       <Box>
         <Header />
       </Box>
 
-      <Flex flex="1" direction="column" justify="center" align="center">
-        <Box flex="1" width="100%">
-          {children}
-        </Box>
-      </Flex>
+      <Box flex="1" p={4}>
+        {children}
+      </Box>
 
       <Box>
         <Footer />

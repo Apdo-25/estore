@@ -24,7 +24,7 @@ const Hero = () => {
       justify={["center", "space-around", "space-between"]}
       direction={["column-reverse", "column-reverse", "row"]}
       wrap="nowrap"
-      minH="70vh"
+      minH="20vh"
       px={8}
       mb={16}
     >
@@ -60,7 +60,7 @@ const Hero = () => {
             size="md"
             rightIcon={<Icon as={FaArrowRight} />}
           >
-            <Link href={"/products"} passHref>
+            <Link href={"/product/Products"} passHref>
               Browse Our Watches
             </Link>
           </Button>
