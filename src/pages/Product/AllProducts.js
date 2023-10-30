@@ -1,10 +1,27 @@
 import { Box } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGrid } from "@/components/ProductGrid";
-import { data } from "@/utils/data";
 import SearchBar from "@/components/SearchBar";
 
 const AllProducts = () => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // Fetch products from your API
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <Box
       mx="auto"
@@ -21,7 +38,7 @@ const AllProducts = () => {
     >
       <SearchBar />
       <ProductGrid>
-        {data.products.map((product) => (
+        {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </ProductGrid>

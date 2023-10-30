@@ -14,7 +14,7 @@ import { PriceTag } from "./PriceTag";
 
 import Image from "next/image";
 import Link from "next/link";
-import { data } from "@/utils/data";
+
 import ProductBadge from "./ProductBadge";
 
 export const ProductCard = (props) => {
