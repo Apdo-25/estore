@@ -6,6 +6,9 @@ import SearchBar from "@/components/SearchBar";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     // Fetch products from your API

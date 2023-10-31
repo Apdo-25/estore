@@ -26,9 +26,10 @@ import {
   AtSignIcon,
 } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import { FiShoppingCart, FiUser } from "react-icons/fi";
+import { CartIcon } from "./CartIcon";
 
 import Link from "next/link";
+import { FiUser } from "react-icons/fi";
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -94,8 +95,8 @@ const Header = () => {
           align="center"
           display={{ base: "none", md: "flex" }}
         >
-          <Link href="/cart">
-            <Button leftIcon={<FiShoppingCart />}>Cart</Button>
+          <Link href="/cart" passHref>
+            <CartIcon />
           </Link>
 
           {/* Other Menu Items */}
@@ -140,12 +141,10 @@ const Header = () => {
               <Link href="/cart" onClick={closeMobileMenu}>
                 <Button
                   variant="ghost"
-                  leftIcon={<FiShoppingCart />}
-                  w="100%"
-                  justifyContent="flex-start"
-                >
-                  Cart
-                </Button>
+                  leftIcon={<CartIcon />}
+                  rounded="full"
+                  iconSpacing={2}
+                />
               </Link>
               <Link href="/login" onClick={closeMobileMenu}>
                 <Button

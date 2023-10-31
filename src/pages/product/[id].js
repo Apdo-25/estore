@@ -16,21 +16,43 @@ import {
 } from "@chakra-ui/react";
 import { MdLocalShipping } from "react-icons/md";
 import { useRouter } from "next/router";
-import { data } from "@/utils/data";
 import ProductBadge from "@/components/ProductBadge";
+import { useEffect, useState, useContext } from "react";
+import { CartContext } from "../../context/CartContext";
 
 const ProductDetail = () => {
   const router = useRouter();
   const { id } = router.query;
-  const product = data.products.find((product) => product.id === id);
+
+  const toast = useToast();
+  const [product, setProduct] = useState(null);
+
+  const { AddItem } = useContext(CartContext);
+
+  useEffect(() => {
+    if (id) {
+      // Fetch product details from your API
+      const fetchProduct = async () => {
+        try {
+          const response = await fetch(`/api/products/${id}`);
+          const productData = await response.json();
+          setProduct(productData);
+        } catch (error) {
+          console.error("Failed to fetch product:", error);
+        }
+      };
+
+      fetchProduct();
+    }
+  }, [id]);
+
+  if (!router.isReady || !product) {
+    return <Text>Loading...</Text>;
+  }
 
   if (!product) {
     return <Text>Product not found</Text>;
   }
-  if (!router.isReady) {
-    return <Text>Loading...</Text>;
-  }
-
   return (
     <Container maxW={"7xl"}>
       <SimpleGrid
@@ -63,7 +85,6 @@ const ProductDetail = () => {
               {product.currency} {product.price}
               {product.salePrice && (
                 <>
-                  {" - "}
                   <chakra.span
                     textDecoration={"line-through"}
                     color={"gray.500"}
@@ -94,6 +115,16 @@ const ProductDetail = () => {
             _hover={{
               transform: "translateY(2px)",
               boxShadow: "lg",
+            }}
+            onClick={() => {
+              AddItem(product.id, 1);
+              toast({
+                title: "Item Added",
+                description: `${product.name} has been added to the cart.`,
+                status: "success",
+                duration: 2000,
+                isClosable: true,
+              });
             }}
           >
             Add to cart
