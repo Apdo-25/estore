@@ -1,3 +1,4 @@
+import React, { useContext } from "react";
 import {
   AspectRatio,
   Box,
@@ -7,6 +8,7 @@ import {
   Stack,
   Text,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 import { Rating } from "./Rating";
 import { FavouriteButton } from "./FavouriteButton";
@@ -16,11 +18,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 import ProductBadge from "./ProductBadge";
+import { CartContext } from "../context/CartContext";
 
 export const ProductCard = (props) => {
   //find data
   const { product } = props;
   const { name, imageUrl, price, salePrice, rating, flag } = product;
+
+  const toast = useToast();
+
+  const { AddItem } = useContext(CartContext);
 
   return (
     <Stack
@@ -72,7 +79,20 @@ export const ProductCard = (props) => {
         </HStack>
       </Stack>
       <Stack align="center">
-        <Button colorScheme="blue" width="full">
+        <Button
+          colorScheme="blue"
+          width="full"
+          onClick={() => {
+            AddItem(product.id, 1);
+            toast({
+              title: "Item Added",
+              description: `${product.name} has been added to the cart.`,
+              status: "success",
+              duration: 2000,
+              isClosable: true,
+            });
+          }}
+        >
           Add to cart
         </Button>
       </Stack>
