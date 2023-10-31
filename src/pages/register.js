@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
-import { useUser } from "../context/userContext";
+import { useUser } from "@/context/UserContext";
 import Link from "next/link";
 
 const Register = () => {

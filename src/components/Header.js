@@ -3,24 +3,25 @@ import {
   Box,
   Button,
   Flex,
-  Input,
   Stack,
   VStack,
   Text,
   useColorMode,
   useColorModeValue,
   IconButton,
-  Slide,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalCloseButton,
   Icon,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
 import {
   MoonIcon,
   SunIcon,
-  SearchIcon,
   HamburgerIcon,
   CloseIcon,
   AtSignIcon,
@@ -30,11 +31,13 @@ import { CartIcon } from "./CartIcon";
 
 import Link from "next/link";
 import { FiUser } from "react-icons/fi";
+import { useUser } from "../context/UserContext";
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { user, logout } = useUser();
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -99,19 +102,36 @@ const Header = () => {
             <CartIcon />
           </Link>
 
-          {/* Other Menu Items */}
-          <Link href={"/login"}>
-            <Button
-              fontSize={"sm"}
-              fontWeight={600}
-              color={"white"}
-              bg={"gray.600"}
-              rounded="full"
-              icon={AtSignIcon}
-            >
-              Sign in
-            </Button>
-          </Link>
+          {/* Render "Account" button when user is logged in, otherwise render "Sign in" button */}
+          {user ? (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Account"
+                icon={<Icon as={FiUser} />}
+                variant="ghost"
+              />
+              <MenuList>
+                <MenuItem onClick={() => logout()}>Log Out</MenuItem>
+                <Link href="/Profile">
+                  <MenuItem>Profile</MenuItem>
+                </Link>
+              </MenuList>
+            </Menu>
+          ) : (
+            <Link href={"/login"}>
+              <Button
+                fontSize={"sm"}
+                fontWeight={600}
+                color={"white"}
+                bg={"gray.600"}
+                rounded="full"
+                icon={AtSignIcon}
+              >
+                Sign in
+              </Button>
+            </Link>
+          )}
 
           <Button
             onClick={toggleColorMode}
@@ -146,16 +166,36 @@ const Header = () => {
                   iconSpacing={2}
                 />
               </Link>
-              <Link href="/login" onClick={closeMobileMenu}>
-                <Button
-                  variant="ghost"
-                  leftIcon={<Icon as={FiUser} />}
-                  w="100%"
-                  justifyContent="flex-start"
-                >
-                  Sign in
-                </Button>
-              </Link>
+              {/* Render "Account" button when user is logged in, otherwise render "Sign in" button */}
+              {user ? (
+                <Menu>
+                  <MenuButton
+                    as={Button} // Change this to Button
+                    leftIcon={<Icon as={FiUser} />}
+                    variant="ghost"
+                  >
+                    {/* Account */}
+                  </MenuButton>
+                  <MenuList>
+                    <MenuItem onClick={() => logout()}>Log Out</MenuItem>
+                    <Link href="/Profile">
+                      <MenuItem>Profile</MenuItem>
+                    </Link>
+                  </MenuList>
+                </Menu>
+              ) : (
+                <Link href="/login" onClick={closeMobileMenu}>
+                  <Button
+                    variant="ghost"
+                    leftIcon={<Icon as={FiUser} />}
+                    w="100%"
+                    justifyContent="flex-start"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
+              )}
+
               <Button
                 onClick={toggleColorMode}
                 variant="ghost"

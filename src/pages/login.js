@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useUser } from "../context/userContext";
+import { useUser } from "@/context/UserContext";
 
 const Login = () => {
   const { setUser } = useUser();

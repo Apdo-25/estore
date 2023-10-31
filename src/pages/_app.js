@@ -1,6 +1,6 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { CartProvider } from "../context/CartContext";
-import { UserProvider } from "../context/userContext";
+import { UserProvider } from "@/context/UserContext";
 import Layout from "@/components/Layout";
 
 const theme = extendTheme({
