@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   FormControl,
@@ -12,14 +12,72 @@ import {
   Heading,
   Text,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-
+import { useRouter } from "next/router";
+import { useUser } from "../context/userContext";
 import Link from "next/link";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+  const { setUser } = useUser();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const router = useRouter();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (!email || !password || !firstName) {
+      toast({
+        description: "Please fill in all required fields.",
+        status: "warning",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok) {
+        setUser(data.user);
+        toast({
+          description: "Registration successful!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 3200);
+      } else {
+        toast({
+          description: data.message || "Registration failed.",
+          status: "error",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      toast({
+        description: "Registration failed. Please try again.",
+        status: "error",
+      });
+    }
+  };
+
   return (
     <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
       <Stack align={"center"}>
@@ -38,24 +96,40 @@ const Register = () => {
             <Box>
               <FormControl id="firstName" isRequired>
                 <FormLabel>First Name</FormLabel>
-                <Input type="text" />
+                <Input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
               </FormControl>
             </Box>
             <Box>
               <FormControl id="lastName">
                 <FormLabel>Last Name</FormLabel>
-                <Input type="text" />
+                <Input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
               </FormControl>
             </Box>
           </HStack>
           <FormControl id="email" isRequired>
             <FormLabel>Email address</FormLabel>
-            <Input type="email" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </FormControl>
           <FormControl id="password" isRequired>
             <FormLabel>Password</FormLabel>
             <InputGroup>
-              <Input type={showPassword ? "text" : "password"} />
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <InputRightElement h={"full"}>
                 <Button
                   variant={"ghost"}
@@ -77,6 +151,7 @@ const Register = () => {
               _hover={{
                 bg: "blue.500",
               }}
+              onClick={handleRegister}
             >
               Sign up
             </Button>

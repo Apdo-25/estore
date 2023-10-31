@@ -1,6 +1,7 @@
-import Layout from "@/components/Layout";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { CartProvider } from "../context/CartContext";
+import { UserProvider } from "../context/userContext";
+import Layout from "@/components/Layout";
 
 const theme = extendTheme({
   fonts: {
@@ -8,13 +9,16 @@ const theme = extendTheme({
     heading: "Inter, sans-serif",
   },
 });
+
 export default function App({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
       <CartProvider>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <UserProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </UserProvider>
       </CartProvider>
     </ChakraProvider>
   );

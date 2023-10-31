@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Flex,
   Box,
@@ -11,11 +11,64 @@ import {
   Heading,
   Text,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useToast } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import { useUser } from "../context/userContext";
 
 const Login = () => {
+  const { setUser } = useUser();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+  const router = useRouter();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      toast({ description: "Please fill in all fields.", status: "warning" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok) {
+        setUser(data.user);
+        toast({
+          description: "Login successful!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 3200);
+      } else {
+        toast({
+          description: data.message || "Login failed.",
+          status: "error",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      toast({
+        description: "Login failed. Please try again.",
+        status: "error",
+      });
+    }
+  };
   return (
     <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
       <Stack align={"center"}>
@@ -30,12 +83,21 @@ const Login = () => {
         <Stack spacing={4}>
           <FormControl id="email">
             <FormLabel>Email address</FormLabel>
-            <Input type="email" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </FormControl>
           <FormControl id="password">
             <FormLabel>Password</FormLabel>
-            <Input type="password" />
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </FormControl>
+
           <Stack spacing={10}>
             <Stack
               direction={{ base: "column", sm: "row" }}
@@ -54,6 +116,7 @@ const Login = () => {
               _hover={{
                 bg: "blue.500",
               }}
+              onClick={handleLogin}
             >
               Sign in
             </Button>

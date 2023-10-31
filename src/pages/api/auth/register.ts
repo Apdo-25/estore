@@ -1,32 +1,45 @@
-// pages/api/users/[id].ts
-import type { NextApiRequest, NextApiResponse } from "next";
-import prisma from "@/utils/prisma";
+import { NextApiRequest, NextApiResponse } from "next";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
-export default async function getUserById(
+const prisma = new PrismaClient();
+
+export default async function register(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id } = req.query;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed." });
+  }
 
-  if (req.method === "GET") {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: String(id) },
-      });
+  const { email, password, firstName, lastName } = req.body;
 
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
+  if (!email || !password || !firstName || !lastName) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
 
-      // Be cautious about returning sensitive user info.
-      // You might want to omit some fields here.
-      const { password, ...userData } = user;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-      return res.status(200).json(userData);
-    } catch (error) {
-      return res.status(500).json({ error: "Internal Server Error" });
+  try {
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already taken." });
     }
-  } else {
-    return res.status(405).end();
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+      },
+    });
+
+    return res.status(201).json({ user });
+  } catch (error) {
+    console.error("Error during registration:", error);
+    return res.status(500).json({ error: "Registration failed." });
+  } finally {
+    await prisma.$disconnect(); // Close the database connection
   }
 }
