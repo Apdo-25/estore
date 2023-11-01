@@ -53,19 +53,7 @@ const Profile: React.FC = () => {
   }, [user]);
 
   const handleChangePassword = () => {
-    // Perform the password change logic here
-    // You can call an API or update the user's password in your backend
-    // After successful change, you can close the modal and handle any necessary state updates
-
-    // Example:
-    // updateUserPassword(user.id, newPassword)
-    //   .then(() => {
-    //     setIsChangePasswordModalOpen(false);
-    //     // Handle any success or feedback to the user
-    //   })
-    //   .catch((error) => {
-    //     // Handle the error
-    //   });
+  
   };
 
   return (

@@ -16,6 +16,8 @@ export default async function getProduct(
     } catch (error) {
       // Handle any errors, e.g., database errors
       res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+      await prisma.$disconnect(); // Close the database connection
     }
   } else {
     // Handle unsupported HTTP methods

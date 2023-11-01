@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useUser } from "@/context/UserContext";
+import jwt from "jsonwebtoken"; // Added import for JWT decoding
 
 const Login = () => {
   const { setUser } = useUser();
@@ -42,19 +43,24 @@ const Login = () => {
       });
 
       const data = await response.json();
-      setLoading(false);
 
       if (response.ok) {
-        setUser(data.user);
+        const decodedUserData = jwt.decode(data.token);
+        if (
+          typeof decodedUserData === "object" &&
+          decodedUserData !== null &&
+          "id" in decodedUserData
+        ) {
+          setUser(decodedUserData); // Set the decoded user data to the user state
+        } else {
+          throw new Error("Invalid user data in JWT");
+        }
+        localStorage.setItem("user", JSON.stringify(decodedUserData));
         toast({
           description: "Login successful!",
           status: "success",
-          duration: 3000,
-          isClosable: true,
         });
-        setTimeout(() => {
-          router.push("/");
-        }, 3200);
+        router.push("/");
       } else {
         toast({
           description: data.message || "Login failed.",
@@ -62,13 +68,15 @@ const Login = () => {
         });
       }
     } catch (error) {
-      setLoading(false);
       toast({
         description: "Login failed. Please try again.",
         status: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
       <Stack align={"center"}>
@@ -97,7 +105,6 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </FormControl>
-
           <Stack spacing={10}>
             <Stack
               direction={{ base: "column", sm: "row" }}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -36,8 +36,16 @@ import { useUser } from "../context/UserContext";
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false); // State to track client-side rendering
   const router = useRouter();
   const { user, logout } = useUser();
+  const bg = useColorModeValue("white", "gray.800");
+  const color = useColorModeValue("gray.800", "white");
+  const borderColor = useColorModeValue("gray.200", "gray.900");
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -47,17 +55,21 @@ const Header = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  if (!isClient) {
+    return null; // or a placeholder if you prefer
+  }
+
   return (
     <Box>
       <Flex
-        bg={useColorModeValue("white", "gray.800")}
-        color={useColorModeValue("gray.800", "white")}
+        bg={bg}
+        color={color}
         minH={"80px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
         borderStyle={"solid"}
-        borderColor={useColorModeValue("gray.200", "gray.900")}
+        borderColor={borderColor}
         align="center"
         justify="space-between"
       >
@@ -119,7 +131,7 @@ const Header = () => {
               </MenuList>
             </Menu>
           ) : (
-            <Link href={"/login"}>
+            <Link href={"/login"} passHref>
               <Button
                 fontSize={"sm"}
                 fontWeight={600}
@@ -149,16 +161,10 @@ const Header = () => {
       <Box display={{ base: "block", md: "none" }}>
         <Modal isOpen={isMobileMenuOpen} onClose={closeMobileMenu} size="full">
           <ModalOverlay />
-          <ModalContent
-            mt={0}
-            mb={0}
-            ml={0}
-            rounded="none"
-            bg={useColorModeValue("white", "gray.800")}
-          >
+          <ModalContent mt={0} mb={0} ml={0} rounded="none" bg={bg}>
             <ModalCloseButton />
             <VStack p={4} spacing={4} align="start" w="100%">
-              <Link href="/cart" onClick={closeMobileMenu}>
+              <Link href="/cart" onClick={closeMobileMenu} passHref>
                 <Button
                   variant="ghost"
                   leftIcon={<CartIcon />}
@@ -184,7 +190,7 @@ const Header = () => {
                   </MenuList>
                 </Menu>
               ) : (
-                <Link href="/login" onClick={closeMobileMenu}>
+                <Link href="/login" onClick={closeMobileMenu} passHref>
                   <Button
                     variant="ghost"
                     leftIcon={<Icon as={FiUser} />}

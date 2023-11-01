@@ -1,4 +1,6 @@
-import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import jwt from "jsonwebtoken";
 
 interface User {
   id: string;
@@ -12,9 +14,11 @@ interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | null>(null);
 
 interface UserProviderProps {
   children: ReactNode;
@@ -22,32 +26,90 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
-  // Initialize user from local storage
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
+    async function loadUserFromCookie() {
+      const response = await fetch('/api/auth/me');
+      if (response.ok) {
+        const user = await response.json();
+        setUser(user);
+      } else {
+        console.error('Error fetching user:', await response.text());
+      }
     }
+    loadUserFromCookie();
   }, []);
+  
+  
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
+  const contextValue = useMemo(() => ({
+    user,
+    setUser,
+    logout: () => {
+      sessionStorage.removeItem('userToken');
+      setUser(null);
+      router.push('/login');
+    },
+    login: async (email, password) => {
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
 
-  const logout = () => {
-    setUser(null);
-    // Clearing user data from local storage
-    localStorage.removeItem('user');
-    // Optionally, you can also clear tokens or other user data from cookies or session storage here
-  };
+        const data = await response.json();
+        
+        if (response.status !== 200) throw new Error(data.error);
+
+        const decodedUserData = jwt.decode(data.token) as jwt.JwtPayload | string;
+
+        if (
+          typeof decodedUserData !== "string" && 
+          decodedUserData && 
+          'id' in decodedUserData && 
+          'email' in decodedUserData && 
+          'firstName' in decodedUserData && 
+          'lastName' in decodedUserData
+      ) {
+          setUser(decodedUserData as unknown as User);
+          sessionStorage.setItem('userToken', data.token);
+      } else {
+          console.error("JWT payload does not have required user fields or is a string.");
+      }
+        
+
+      } catch (error) {
+        console.error("Error during login:", error);
+      }
+    },
+    register: async (data) => {
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        const returnedData = await response.json();
+        
+        if (response.status !== 201) throw new Error(returnedData.error);
+
+        setUser(returnedData.user);
+        router.push('/login');
+      } catch (error) {
+        console.error("Error during registration:", error);
+      }
+    },
+  }), [user, router]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );
@@ -55,7 +117,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
