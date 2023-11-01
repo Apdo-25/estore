@@ -1,6 +1,5 @@
 import { createContext, useReducer, useEffect } from "react";
-import Cookies from 'js-cookie';
-import { v4 as uuidv4 } from "uuid";
+import { getSessionId } from "@/utils/sessionUtil";
 import { useToast } from "@chakra-ui/react";
 
 const initialize = {
@@ -54,16 +53,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const toast = useToast();
 
   useEffect(() => {
-    if (!Cookies.get("sessionId")) {
-      Cookies.set("sessionId", uuidv4());
-    }
+    const sessionId = getSessionId(); // Use the utility function
     
     const fetchCartData = async () => {
       dispatch({ type: "START_LOADING" });
       try {
         const response = await fetch("/api/cart", {
           headers: {
-            "sessionId": Cookies.get("sessionId"),
+            "sessionId": sessionId,
           },
         });
         const data = await response.json();
@@ -86,14 +83,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const AddItem = async (productId, quantity = 1) => {
-    const newItem = { productId, quantity };
+    const sessionId = getSessionId(); // Use the utility function
     
     try {
       const response = await fetch("/api/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "sessionId": Cookies.get("sessionId")
+          "sessionId": sessionId,
         },
         body: JSON.stringify({ productId, quantity }),
       });
@@ -103,7 +100,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error(data.message);
       }
   
-      // Assuming the server returns the actual item that was added, with its 'id'
       dispatch({ type: "ADD_ITEM", payload: data });
     } catch (error) {
       console.error("Failed to add item to cart:", error);
@@ -116,7 +112,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
     }
   };
-  
   
   const RemoveItem = async (id) => {
     try {
@@ -154,3 +149,4 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     </CartContext.Provider>
   );
 };
+

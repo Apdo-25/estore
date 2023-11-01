@@ -5,7 +5,7 @@ import { Box } from "@chakra-ui/react";
 
 const CartPage = () => {
   const { cart } = useContext(CartContext);
-  console.log(cart);
+
   return (
     <Box
       mx="auto"
