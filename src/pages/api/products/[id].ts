@@ -1,4 +1,3 @@
-// pages/api/products/[id].ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/utils/prisma";
 

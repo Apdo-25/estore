@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSessionId } from "@/utils/sessionUtil";
-
-const prisma = new PrismaClient();
 
 export default async function handleCart(
   req: NextApiRequest,
