@@ -13,7 +13,7 @@ type CartState = {
 };
 
 type CartContextType = CartState & {
-  AddItem: (item: any) => void;
+  AddItem: (productId: string, quantity: number) => void;
   RemoveItem: (id: string) => void;
 };
 
@@ -53,17 +53,18 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const toast = useToast();
 
   useEffect(() => {
-    const sessionId = getSessionId(); // Use the utility function
-    
+    const sessionId = getSessionId();
+
     const fetchCartData = async () => {
       dispatch({ type: "START_LOADING" });
       try {
         const response = await fetch("/api/cart", {
           headers: {
-            "sessionId": sessionId,
+            "session-id": sessionId,
           },
         });
         const data = await response.json();
+        console.log(data);
         dispatch({ type: "SET_INITIAL_CART", payload: data });
       } catch (error) {
         console.error("Failed to fetch cart data:", error);
@@ -82,24 +83,24 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     fetchCartData();
   }, []);
 
-  const AddItem = async (productId, quantity = 1) => {
-    const sessionId = getSessionId(); // Use the utility function
-    
+  const AddItem = async (productId: string, quantity = 1) => {
+    const sessionId = getSessionId();
+
     try {
       const response = await fetch("/api/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "sessionId": sessionId,
+          "session-id": sessionId,
         },
         body: JSON.stringify({ productId, quantity }),
       });
-    
+
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.message);
       }
-  
+
       dispatch({ type: "ADD_ITEM", payload: data });
     } catch (error) {
       console.error("Failed to add item to cart:", error);
@@ -112,13 +113,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
     }
   };
-  
-  const RemoveItem = async (id) => {
+
+  const RemoveItem = async (id: string) => {
     try {
       const response = await fetch(`/api/cart/${id}`, {
         method: "DELETE",
       });
-  
+
       if (response.ok) {
         dispatch({ type: "REMOVE_ITEM", payload: id });
       } else {
@@ -149,4 +150,3 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     </CartContext.Provider>
   );
 };
-

@@ -14,6 +14,7 @@ export default async function handleCartItem(
       case "GET":
         const cartItem = await prisma.cart.findUnique({
           where: { id: cartId },
+          include: { product: true, user: true }, // Include product and user details with cart item
         });
         if (!cartItem) {
           return res.status(404).json({ error: "Cart item not found" });
@@ -45,9 +46,7 @@ export default async function handleCartItem(
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
-    console.error(error); // Log the error for debugging.
+    console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
-  } finally {
-    await prisma.$disconnect(); // Close the Prisma client connection.
   }
 }

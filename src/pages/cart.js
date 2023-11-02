@@ -20,9 +20,12 @@ const CartPage = () => {
         lg: "12",
       }}
     >
-      {cart.map(
-        (item) => item.product && <CartItem key={item.id} item={item} />
-      )}
+      {cart.map((item) => {
+        if (!item.product) {
+          console.warn("Suspicious cart item without product:", item);
+        }
+        return item.product && <CartItem key={item.id} item={item} />;
+      })}
     </Box>
   );
 };

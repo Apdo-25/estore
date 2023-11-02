@@ -36,7 +36,7 @@ export const CartItem = ({ item }: { item: CartItemType }) => {
       title: "Item Removed",
       description: `${name} has been removed from the cart.`,
       status: "info",
-      duration: 2000,
+      duration: 1000,
       isClosable: true,
     });
   };

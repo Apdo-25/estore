@@ -1,4 +1,3 @@
-// pages/api/products/update.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/utils/prisma";
 
@@ -27,8 +26,7 @@ export default async function createProduct(
       } = req.body;
 
       // Update the product in the database using Prisma
-      const createProduct = await prisma.product.update({
-        where: { id },
+      const createProduct = await prisma.product.create({
         data: {
           name,
           currency,

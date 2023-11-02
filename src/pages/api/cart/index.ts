@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-import { v4 as uuidv4 } from "uuid";
+import { getSessionId } from "@/utils/sessionUtil";
 
 const prisma = new PrismaClient();
 
@@ -8,28 +8,36 @@ export default async function handleCart(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Ensure the sessionId is set and is retrieved properly.
-  let sessionId: string | null = req.cookies.sessionId || uuidv4();
+  let sessionId = getSessionId(req);
 
-  // Set a new sessionId in case it doesn't exist.
-  if (!req.cookies.sessionId) {
-    res.setHeader("Set-Cookie", `sessionId=${sessionId}; Path=/; HttpOnly`);
+  if (!req.cookies["session-id"]) {
+    res.setHeader("Set-Cookie", `session-id=${sessionId}; Path=/; HttpOnly`);
   }
 
   try {
     switch (req.method) {
       case "GET":
-        const carts = await prisma.cart.findMany({ where: { sessionId } });
-        return res.status(200).json(carts);
+        const carts = await prisma.cart.findMany({
+          where: { sessionId },
+          include: { product: true, user: true }, // Include product and user details with each cart item
+        });
+        res.status(200).json(carts);
+        break;
 
       case "POST":
         const { productId, quantity } = req.body;
 
-        // Validate productId and quantity before processing.
         if (!productId || typeof quantity !== "number" || quantity <= 0) {
           return res.status(400).json({
             error: "Invalid productId or quantity.",
           });
+        }
+
+        const productExists = await prisma.product.findUnique({
+          where: { id: productId },
+        });
+        if (!productExists) {
+          return res.status(404).json({ error: "Product not found" });
         }
 
         const cartItem = await prisma.cart.create({
@@ -39,22 +47,17 @@ export default async function handleCart(
             quantity,
           },
         });
-        return res.status(201).json(cartItem);
+        res.status(201).json(cartItem);
+        break;
 
       default:
         res.setHeader("Allow", ["GET", "POST"]);
-        return res.status(405).end(`Method ${req.method} Not Allowed`);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
     console.error("Error handling cart request:", error);
-
-    // Send a detailed error message for better debugging.
-    // Note: In a production environment, you might want to limit the amount of detail exposed.
-    return res.status(500).json({
+    res.status(500).json({
       error: `An error occurred: ${error.message}`,
     });
-  } finally {
-    // Ensure that the Prisma client connection is closed after the operation.
-    await prisma.$disconnect();
   }
 }
