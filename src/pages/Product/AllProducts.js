@@ -1,30 +1,9 @@
 import { Box } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGrid } from "@/components/ProductGrid";
 import SearchBar from "@/components/SearchBar";
 
-const AllProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    // Fetch products from your API
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("/api/products");
-        const data = await response.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
+const AllProducts = ({ products }) => {
   return (
     <Box
       mx="auto"
@@ -48,5 +27,24 @@ const AllProducts = () => {
     </Box>
   );
 };
+
+export async function getServerSideProps() {
+  let products = [];
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"; // Set your default URL or get from environment variable
+
+  try {
+    const response = await fetch(`${apiUrl}/api/products`);
+    products = await response.json();
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+  }
+
+  return {
+    props: {
+      products,
+    },
+  };
+}
 
 export default AllProducts;

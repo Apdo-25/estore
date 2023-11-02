@@ -17,34 +17,14 @@ import {
 import { MdLocalShipping } from "react-icons/md";
 import { useRouter } from "next/router";
 import ProductBadge from "@/components/ProductBadge";
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { CartContext } from "../../context/CartContext";
 
-const ProductDetail = () => {
+const ProductDetail = ({ product }) => {
   const router = useRouter();
-  const { id } = router.query;
-
   const toast = useToast();
-  const [product, setProduct] = useState(null);
 
   const { AddItem } = useContext(CartContext);
-
-  useEffect(() => {
-    if (id) {
-      // Fetch product details from your API
-      const fetchProduct = async () => {
-        try {
-          const response = await fetch(`/api/products/${id}`);
-          const productData = await response.json();
-          setProduct(productData);
-        } catch (error) {
-          console.error("Failed to fetch product:", error);
-        }
-      };
-
-      fetchProduct();
-    }
-  }, [id]);
 
   if (!router.isReady || !product) {
     return <Text>Loading...</Text>;
@@ -138,5 +118,25 @@ const ProductDetail = () => {
     </Container>
   );
 };
+
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  let product = null;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"; // Set your default URL or get from environment variable
+
+  try {
+    const response = await fetch(`${apiUrl}/api/products/${id}`);
+    product = await response.json();
+  } catch (error) {
+    console.error("Failed to fetch product:", error);
+  }
+
+  return {
+    props: {
+      product,
+    },
+  };
+}
 
 export default ProductDetail;
