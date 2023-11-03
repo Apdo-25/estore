@@ -1,25 +1,37 @@
 import { createContext, useReducer, useEffect } from "react";
 import { getSessionId } from "@/utils/sessionUtil";
 import { useToast } from "@chakra-ui/react";
+import { CartItem } from '../components/cartpage/CartItem';
 
 const initialize = {
-  cart: [],
+  CartItem: [],
   loading: false,
 };
 
+type CartItem = {
+  id: string;
+  product: {
+    id: string;
+    price: Float;
+  };
+  quantity: Int;
+};
+
 type CartState = {
-  cart: {}[];
+  CartItem: [];
   loading: boolean;
 };
 
 type CartContextType = CartState & {
   AddItem: (productId: string, quantity: number) => void;
   RemoveItem: (id: string) => void;
+  UpdateItem: (id: string, quantity: number) => void
 };
 
 type CartAction =
   | { type: "ADD_ITEM"; payload: any }
   | { type: "REMOVE_ITEM"; payload: string }
+  | { type: "UPDATE_QUANTITY"; payload: [string, number] }
   | { type: "SET_INITIAL_CART"; payload: any[] }
   | { type: "START_LOADING" }
   | { type: "STOP_LOADING" };
@@ -27,14 +39,24 @@ type CartAction =
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case "ADD_ITEM":
-      return { ...state, cart: [...state.cart, action.payload] };
+      return { ...state, CartItem: [...state.CartItem, action.payload] };
     case "REMOVE_ITEM":
       return {
         ...state,
-        cart: state.cart.filter((item) => item.id !== action.payload),
+        CartItem: state.CartItem.filter((item) => item.id !== action.payload),
       };
+      case "UPADATE_ITEM":
+        return {
+          ...state,
+          CartItem: state.CartItem.map((item) => {
+            if (item.id === action.payload[0]) {
+              return { ...item, quantity: action.payload[1] };
+            }
+            return item;
+          }),
+        };
     case "SET_INITIAL_CART":
-      return { ...state, cart: action.payload };
+      return { ...state, CartItem: action.payload };
     case "START_LOADING":
       return { ...state, loading: true };
     case "STOP_LOADING":
@@ -114,6 +136,38 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+
+  const UpdateItem = async (id: string, quantity: number) => {
+    const sessionId = getSessionId();
+
+    try {
+      const response = await fetch(`/api/cart/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "session-id": sessionId,
+        },
+        body: JSON.stringify({ quantity }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      dispatch({ type: "UPDATE_QUANTITY", payload: [id, quantity] });
+    } catch (error) {
+      console.error("Failed to update item in cart:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update item in cart.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   const RemoveItem = async (id: string) => {
     try {
       const response = await fetch(`/api/cart/${id}`, {
@@ -145,7 +199,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <CartContext.Provider value={{ ...state, AddItem, RemoveItem }}>
+    <CartContext.Provider value={{ ...state, AddItem, RemoveItem, UpdateItem }}>
       {children}
     </CartContext.Provider>
   );

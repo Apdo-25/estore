@@ -7,21 +7,32 @@ export default async function getProductById(
 ) {
   const { id } = req.query;
 
-  if (req.method === "GET") {
-    try {
+  try {
+    if (req.method === "GET") {
       const product = await prisma.product.findUnique({
         where: { id: String(id) },
       });
 
-      if (!product) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-
+      if (!product) return res.status(404).json({ error: "Product not found" });
       return res.status(200).json(product);
-    } catch (error) {
-      return res.status(500).json({ error: "Internal Server Error" });
+    } else if (req.method === "DELETE") {
+      await prisma.product.delete({ where: { id: id.toString() } });
+      res.status(204).end();
+    } else if (req.method === "PUT") {
+      const { id, ...data } = req.body;
+
+      const updatedProduct = await prisma.product.update({
+        where: { id },
+        data,
+      });
+
+      res.status(200).json(updatedProduct);
+    } else {
+      res.status(405).end(); // Unsupported HTTP method
     }
-  } else {
-    return res.status(405).end();
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    await prisma.$disconnect();
   }
 }

@@ -4,7 +4,7 @@ import { CartItem } from "../components/CartItem";
 import { Box } from "@chakra-ui/react";
 
 const CartPage = () => {
-  const { cart } = useContext(CartContext);
+  const { CartItem } = useContext(CartContext);
 
   return (
     <Box
@@ -20,7 +20,7 @@ const CartPage = () => {
         lg: "12",
       }}
     >
-      {cart.map((item) => {
+      {CartItem.map((item) => {
         if (!item.product) {
           console.warn("Suspicious cart item without product:", item);
         }
