@@ -5,22 +5,33 @@ export default async function getProduct(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Handle GET request to retrieve product data
   if (req.method === "GET") {
-    try {
-      // Retrieve product data from the database using Prisma
-      const products = await prisma.product.findMany();
+    // Default values
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10; // default limit to 10 items
 
-      // Return the list of products as JSON response
-      res.status(200).json(products);
+    // Skip calculates how many items to skip based on the current page
+    const skip = (page - 1) * limit;
+
+    try {
+      const products = await prisma.product.findMany({
+        skip: skip,
+        take: limit,
+      });
+
+      const totalProducts = await prisma.product.count(); // To inform the client about the total number of products
+
+      res.status(200).json({
+        data: products,
+        totalPages: Math.ceil(totalProducts / limit), // Total number of pages
+        currentPage: page,
+      });
     } catch (error) {
-      // Handle any errors, e.g., database errors
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
-      await prisma.$disconnect(); // Close the database connection
+      await prisma.$disconnect();
     }
   } else {
-    // Handle unsupported HTTP methods
     res.status(405).end();
   }
 }

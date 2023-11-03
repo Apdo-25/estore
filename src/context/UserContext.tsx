@@ -1,6 +1,6 @@
-import { createContext, useContext, ReactNode, useState, useEffect, useMemo } from 'react';
+import { createContext, useContext, ReactNode, useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import jwt from "jsonwebtoken";
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 interface User {
   id: string;
@@ -24,71 +24,44 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
+const mapSessionToUser = (sessionUser: any): User => {
+  return {
+    id: sessionUser.id || '', // Assume there's an id in session user, adjust if different
+    email: sessionUser.email,
+    firstName: sessionUser.name?.split(' ')[0] || '',
+    lastName: sessionUser.name?.split(' ')[1] || '',
+    role: 'user' // Assume a default role, adjust if you have roles in session
+  };
+}
+
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
+  const { data: session } = useSession();
+  const [user, setUser] = useState<User | null>(session?.user ? mapSessionToUser(session.user) : null);
   const router = useRouter();
 
   useEffect(() => {
-    async function loadUserFromCookie() {
-      const response = await fetch('/api/auth/me');
-      if (response.ok) {
-        const user = await response.json();
-        setUser(user);
-      } else {
-        console.error('Error fetching user:', await response.text());
-      }
+    if (session?.user) {
+      setUser(mapSessionToUser(session.user));
     }
-    loadUserFromCookie();
-  }, []);
-  
-  
+  }, [session]);
 
   const contextValue = useMemo(() => ({
     user,
     setUser,
     logout: () => {
-      sessionStorage.removeItem('userToken');
+      signOut();
       setUser(null);
       router.push('/login');
     },
     login: async (email, password) => {
-      try {
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-        
-        if (response.status !== 200) throw new Error(data.error);
-
-        const decodedUserData = jwt.decode(data.token) as jwt.JwtPayload | string;
-
-        if (
-          typeof decodedUserData !== "string" && 
-          decodedUserData && 
-          'id' in decodedUserData && 
-          'email' in decodedUserData && 
-          'firstName' in decodedUserData && 
-          'lastName' in decodedUserData
-      ) {
-          setUser(decodedUserData as unknown as User);
-          sessionStorage.setItem('userToken', data.token);
-      } else {
-          console.error("JWT payload does not have required user fields or is a string.");
-      }
-        
-
-      } catch (error) {
-        console.error("Error during login:", error);
+      const response = await signIn('credentials', { redirect: false, email, password });
+      if (!response.ok) {
+        throw new Error('Login failed');
       }
     },
     register: async (data) => {
       try {
-        const response = await fetch('/api/register', {
+        const response = await fetch('/api/users/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

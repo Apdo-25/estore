@@ -1,5 +1,4 @@
 import { createContext, useReducer, useEffect } from "react";
-import { getSessionId } from "@/utils/sessionUtil";
 import { useToast } from "@chakra-ui/react";
 import { CartItem } from '../components/cartpage/CartItem';
 
@@ -75,7 +74,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const toast = useToast();
 
   useEffect(() => {
-    const sessionId = getSessionId();
+
 
     const fetchCartData = async () => {
       dispatch({ type: "START_LOADING" });
@@ -106,7 +105,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const AddItem = async (productId: string, quantity = 1) => {
-    const sessionId = getSessionId();
+
 
     try {
       const response = await fetch("/api/cart", {
@@ -138,7 +137,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
 
   const UpdateItem = async (id: string, quantity: number) => {
-    const sessionId = getSessionId();
+
 
     try {
       const response = await fetch(`/api/cart/${id}`, {

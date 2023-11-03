@@ -16,13 +16,11 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useUser } from "@/context/UserContext";
-import jwt from "jsonwebtoken"; // Added import for JWT decoding
 
 const Login = () => {
-  const { setUser } = useUser();
+  const { login } = useUser(); // Destructure login function
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const toast = useToast();
   const router = useRouter();
 
@@ -34,46 +32,15 @@ const Login = () => {
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const decodedUserData = jwt.decode(data.token);
-        if (
-          typeof decodedUserData === "object" &&
-          decodedUserData !== null &&
-          "id" in decodedUserData
-        ) {
-          setUser(decodedUserData); // Set the decoded user data to the user state
-        } else {
-          throw new Error("Invalid user data in JWT");
-        }
-        localStorage.setItem("user", JSON.stringify(decodedUserData));
-        toast({
-          description: "Login successful!",
-          status: "success",
-        });
-        router.push("/");
-      } else {
-        toast({
-          description: data.message || "Login failed.",
-          status: "error",
-        });
-      }
+      await login(email, password);
+      toast({ description: "Login successful!", status: "success" });
+      router.push("/");
     } catch (error) {
       toast({
-        description: "Login failed. Please try again.",
+        description: error.message || "Login failed. Please try again.",
         status: "error",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

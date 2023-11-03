@@ -1,58 +1,51 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/utils/prisma";
+import * as yup from "yup";
+import { Prisma } from "@prisma/client";
+
+// Define a schema to validate the product data
+const productSchema = yup.object().shape({
+  name: yup.string().required(),
+  currency: yup.string().required().length(3),
+  price: yup.number().positive().required(),
+  description: yup.string().required(),
+  flag: yup.string().oneOf(["new", "on_sale", "regular"]).required(),
+  imageUrl: yup.string().url().required(),
+  rating: yup.number().min(0).max(5).required(),
+  ratingCount: yup.number().min(0).required(),
+  features: yup.array(yup.string()).required(),
+  salePrice: yup.number().positive(),
+  createdAt: yup.date().default(function () {
+    return new Date();
+  }),
+  updatedAt: yup.date().default(function () {
+    return new Date();
+  }),
+});
 
 export default async function createProduct(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Handle POST  request to create a product
   if (req.method === "POST") {
     try {
-      // Process and validate the request body
-      const {
-        id,
-        name,
-        currency,
-        price,
-        description,
-        flag,
-        imageUrl,
-        rating,
-        ratingCount,
-        features,
-        salePrice,
-        createdAt,
-        updatedAt,
-      } = req.body;
+      const validatedProduct = await productSchema.validate(req.body);
 
-      // Update the product in the database using Prisma
-      const createProduct = await prisma.product.create({
-        data: {
-          name,
-          currency,
-          price,
-          description,
-          flag,
-          imageUrl,
-          rating,
-          ratingCount,
-          features,
-          salePrice,
-          createdAt,
-          updatedAt,
-        },
+      const newProduct = await prisma.product.create({
+        data: validatedProduct as unknown as Prisma.ProductCreateInput, // Cast to the expected type
       });
 
-      // Return the newly created product as JSON response
-      res.status(200).json(createProduct);
+      res.status(200).json(newProduct);
     } catch (error) {
-      // Handle any errors, e.g., validation errors or database errors
-      res.status(500).json({ error: "Internal Server Error" });
+      if (error instanceof yup.ValidationError) {
+        res.status(400).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Internal Server Error" });
+      }
     } finally {
-      await prisma.$disconnect(); // Close the database connection
+      await prisma.$disconnect();
     }
   } else {
-    // Handle unsupported HTTP methods
     res.status(405).end();
   }
 }

@@ -2,6 +2,7 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { CartProvider } from "../context/CartContext";
 import { UserProvider } from "@/context/UserContext";
 import Layout from "@/components/Layout";
+import { SessionProvider } from "next-auth/react";
 
 const theme = extendTheme({
   fonts: {
@@ -13,13 +14,15 @@ const theme = extendTheme({
 export default function App({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
-      <CartProvider>
-        <UserProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </UserProvider>
-      </CartProvider>
+      <SessionProvider session={pageProps.session}>
+        <CartProvider>
+          <UserProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </UserProvider>
+        </CartProvider>
+      </SessionProvider>
     </ChakraProvider>
   );
 }

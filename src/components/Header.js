@@ -28,7 +28,6 @@ import {
 } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { CartIcon } from "./CartIcon";
-
 import Link from "next/link";
 import { FiUser } from "react-icons/fi";
 import { useUser } from "../context/UserContext";
@@ -36,9 +35,8 @@ import { useUser } from "../context/UserContext";
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false); // State to track client-side rendering
-  const router = useRouter();
-  const { user, logout } = useUser();
+  const [isClient, setIsClient] = useState(false);
+  const { user, logout } = useUser(); // Extract user and logout function from UserContext
   const bg = useColorModeValue("white", "gray.800");
   const color = useColorModeValue("gray.800", "white");
   const borderColor = useColorModeValue("gray.200", "gray.900");
