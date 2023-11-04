@@ -1,7 +1,7 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-
 import { UserProvider } from "@/context/UserContext";
 import { ProductProvider } from "@/context/ProductContext";
+import { CartProvider } from "@/context/CartContext";
 import Layout from "@/components/Layout";
 import { SessionProvider } from "next-auth/react";
 
@@ -18,9 +18,11 @@ export default function App({ Component, pageProps }) {
       <SessionProvider session={pageProps.session}>
         <UserProvider>
           <ProductProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <CartProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </CartProvider>
           </ProductProvider>
         </UserProvider>
       </SessionProvider>

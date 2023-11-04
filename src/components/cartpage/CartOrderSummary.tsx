@@ -12,8 +12,8 @@ import {
 } from '@chakra-ui/react'
 import { FaArrowRight } from 'react-icons/fa'
 import { formatPrice } from './PriceTag'
-import { useContext, useState } from 'react'
-import { CartContext } from '@/context/CartContext'
+import { useCart } from '@/context/CartContext'
+import { useState } from 'react'
 
 type OrderSummaryItemProps = {
     label: string
@@ -37,20 +37,26 @@ const OrderSummaryItem = (props: OrderSummaryItemProps) => {
 
 type CartItemType = {
     product: {
-        price: Float;
+        id: string
+        name: string
+        description: string
+        price: number
+        imageUrl: string
     }
-    quantity: Int;
+    quantity: number
 }
 
 export const CartOrderSummary = () => {
-    const { cart } = useContext(CartContext)
+    const { cart } = useCart()
     const [coupon, setCoupon] = useState('')
 
 
-    const totalPrice = cart.reduce((total: Float, item: CartItemType) => {
-        return total + (item.product.price * item.quantity);
-    }, 0);
-    
+    const totalPrice = cart?.reduce((total, item) => {
+        if (item && item.product && typeof item.product.price === 'number') {
+            return total + item.product.price * item.quantity;
+        }
+        return total; // if the item or product is not valid, just return the accumulated total so far
+    }, 0) || 0;
 
     return (
         <Stack spacing="8" borderWidth="1px" rounded="lg" padding="8" width="full">

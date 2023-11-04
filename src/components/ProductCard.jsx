@@ -18,7 +18,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import ProductBadge from "./ProductBadge";
-import { CartContext } from "../context/CartContext";
+import { useCart } from "@/context/CartContext";
 
 export const ProductCard = (props) => {
   //find data
@@ -27,7 +27,7 @@ export const ProductCard = (props) => {
 
   const toast = useToast();
 
-  const { AddItem } = useContext(CartContext);
+  const { addItem } = useCart();
 
   return (
     <Stack
@@ -83,7 +83,7 @@ export const ProductCard = (props) => {
           colorScheme="blue"
           width="full"
           onClick={() => {
-            AddItem(product.id, 1);
+            addItem(product.id, 1);
             toast({
               title: "Item Added",
               description: `${product.name} has been added to the cart.`,

@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { v4 as uuidv4 } from "uuid";
 
 import prisma from "@/utils/prisma";
 import bcrypt from "bcrypt";
@@ -22,8 +23,10 @@ export default NextAuth({
           where: { email: credentials.email },
         });
 
+        console.error("Authorization error:");
+
         if (!user) {
-          throw new Error("No user found");
+          return null; // Instead of throwing, return null to indicate failure
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -32,11 +35,10 @@ export default NextAuth({
         );
 
         if (!isPasswordValid) {
-          throw new Error("Invalid password");
+          return null; // As above, return null for NextAuth to handle the error
         }
 
-        delete user.password;
-
+        // Safe user object for the token without the password
         return {
           id: user.id,
           email: user.email,
@@ -65,33 +67,42 @@ export default NextAuth({
     maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    async redirect({ url, baseUrl, ...rest }) {
+    async redirect({ url, baseUrl }) {
+      // Ensure redirects always lead to your site's domain for added security
       return baseUrl;
     },
 
     async jwt({ token, user }) {
+      // When a new session is initiated, populate the JWT with user info
       if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-        token.role = user.role;
+        token.id = String(user.id);
+        token.email = String(user.email);
+        token.firstName = String(user.firstName);
+        token.lastName = String(user.lastName);
+        token.role = String(user.role);
+      } else {
+        // Generate a unique identifier for a guest session if there is no user object
+        token.guestSessionId = token.guestSessionId || uuidv4();
       }
       return token;
     },
-    async session({ session, token, user }) {
-      return {
-        ...session,
-        userId: user?.id || undefined,
-        user: {
-          ...session.user,
-          id: token.id,
-          firstName: token.firstName,
-          lastName: token.lastName,
-          email: token.email,
-          role: token.role,
-        },
-      };
+
+    async session({ session, token }) {
+      // Append user info to the session if there is a user
+      if (token.id) {
+        session.user = {
+          id: String(token.id),
+          firstName: String(token.firstName),
+          lastName: String(token.lastName),
+          email: String(token.email),
+          role: token.role === "admin" ? "admin" : "user",
+        };
+      }
+      // Add the guest session ID to the session object if present
+      if (token.guestSessionId) {
+        session.guestSessionId = String(token.guestSessionId);
+      }
+      return session;
     },
   },
 });
