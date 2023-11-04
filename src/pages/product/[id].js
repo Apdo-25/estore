@@ -19,6 +19,7 @@ import ProductBadge from "../../components/ProductBadge";
 import { useRouter } from "next/router";
 import { useProducts } from "../../context/ProductContext";
 import { useEffect, useState } from "react";
+import { useCart } from "../../context/CartContext";
 
 const ProductDetail = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { fetchProductById, error } = useProducts(); // Use fetchProductById from context
   const [product, setProduct] = useState(null);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     if (id) {
@@ -124,7 +126,7 @@ const ProductDetail = () => {
               boxShadow: "lg",
             }}
             onClick={() => {
-              AddItem(product.id, 1);
+              addToCart(product.id, 1);
               toast({
                 title: "Item Added",
                 description: `${product.name} has been added to the cart.`,

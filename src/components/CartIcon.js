@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { useColorMode, IconButton, Box, Text } from "@chakra-ui/react";
-import { CartContext } from "../context/CartContext";
+import { useCart } from "../context/CartContext";
 import { FiShoppingCart } from "react-icons/fi";
 
 export const CartIcon = () => {
-  const { cart } = useContext(CartContext);
+  const { cart } = useCart();
   const { colorMode } = useColorMode();
 
   const iconColor = { light: "gray.600", dark: "gray.300" };

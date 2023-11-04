@@ -65,6 +65,10 @@ export default NextAuth({
     maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
+    async redirect({ url, baseUrl, ...rest }) {
+      return baseUrl;
+    },
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -75,9 +79,10 @@ export default NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       return {
         ...session,
+        userId: user?.id || undefined,
         user: {
           ...session.user,
           id: token.id,

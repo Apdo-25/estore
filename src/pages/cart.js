@@ -1,10 +1,18 @@
-import React, { useContext } from "react";
-import { CartContext } from "../context/CartContext";
-import { CartItem } from "../components/CartItem";
+import React from "react";
+import { useCart } from "@/context/CartContext"; // Adjust this import based on the actual location
 import { Box } from "@chakra-ui/react";
+import { CartItem } from "@/components/cartpage/CartItem";
 
 const CartPage = () => {
-  const { CartItem } = useContext(CartContext);
+  const { cart } = useCart(); // Use useCart hook directly
+
+  if (cart.length === 0) {
+    return (
+      <Box mx="auto" py="12">
+        Your cart is empty.
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -20,12 +28,9 @@ const CartPage = () => {
         lg: "12",
       }}
     >
-      {CartItem.map((item) => {
-        if (!item.product) {
-          console.warn("Suspicious cart item without product:", item);
-        }
-        return item.product && <CartItem key={item.id} item={item} />;
-      })}
+      {cart.map((item) => (
+        <CartItem key={item.id} item={item} />
+      ))}
     </Box>
   );
 };

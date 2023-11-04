@@ -62,7 +62,7 @@ model Cart {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   user      User?    @relation(fields: [userId], references: [id])
   userId    String?  @db.ObjectId
-  sessionId String
+  sessionId String?
   product   Product  @relation(fields: [productId], references: [id])
   productId String   @db.ObjectId
   quantity  Int
