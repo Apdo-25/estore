@@ -1,6 +1,7 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { CartProvider } from "../context/CartContext";
 import { UserProvider } from "@/context/UserContext";
+import { ProductProvider } from "@/context/ProductContext";
 import Layout from "@/components/Layout";
 import { SessionProvider } from "next-auth/react";
 
@@ -15,13 +16,15 @@ export default function App({ Component, pageProps }) {
   return (
     <ChakraProvider theme={theme}>
       <SessionProvider session={pageProps.session}>
-        <CartProvider>
-          <UserProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </UserProvider>
-        </CartProvider>
+        <UserProvider>
+          <ProductProvider>
+            <CartProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </CartProvider>
+          </ProductProvider>
+        </UserProvider>
       </SessionProvider>
     </ChakraProvider>
   );

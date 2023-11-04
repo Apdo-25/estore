@@ -1,38 +1,65 @@
 import {
   Box,
-  chakra,
-  Container,
-  Stack,
-  Text,
-  Image,
-  Flex,
-  VStack,
   Button,
+  Container,
   Heading,
-  SimpleGrid,
+  Image,
   List,
   ListItem,
+  SimpleGrid,
+  Stack,
+  Text,
   useToast,
+  Flex,
+  chakra,
+  CircularProgress,
 } from "@chakra-ui/react";
 import { MdLocalShipping } from "react-icons/md";
+import ProductBadge from "../../components/ProductBadge";
 import { useRouter } from "next/router";
-import ProductBadge from "@/components/ProductBadge";
-import { useContext } from "react";
-import { CartContext } from "../../context/CartContext";
+import { useProducts } from "../../context/ProductContext";
+import { useEffect, useState } from "react";
 
-const ProductDetail = ({ product }) => {
+const ProductDetail = () => {
   const router = useRouter();
+  const { id } = router.query; // Use router query to get the product ID
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  const { fetchProductById, error } = useProducts(); // Use fetchProductById from context
+  const [product, setProduct] = useState(null);
 
-  const { AddItem } = useContext(CartContext);
+  useEffect(() => {
+    if (id) {
+      setIsLoading(true); // Set loading to true when we start fetching
+      fetchProductById(id)
+        .then((product) => {
+          setProduct(product);
+          setIsLoading(false); // Set loading to false when fetch is successful
+        })
+        .catch((error) => {
+          console.error("Failed to fetch product:", error);
+          setIsLoading(false); // Also set loading to false when fetch fails
+        });
+    }
+  }, [id, fetchProductById]);
 
-  if (!router.isReady || !product) {
-    return <Text>Loading...</Text>;
+  if (error) {
+    return <Text>{error}</Text>; // Display error if there is one
   }
 
-  if (!product) {
-    return <Text>Product not found</Text>;
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minH="60vh"
+      >
+        <CircularProgress isIndeterminate />
+      </Box>
+    );
   }
+
   return (
     <Container maxW={"7xl"}>
       <SimpleGrid
@@ -118,25 +145,5 @@ const ProductDetail = ({ product }) => {
     </Container>
   );
 };
-
-export async function getServerSideProps(context) {
-  const { id } = context.params;
-  let product = null;
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"; // Set your default URL or get from environment variable
-
-  try {
-    const response = await fetch(`${apiUrl}/api/products/${id}`);
-    product = await response.json();
-  } catch (error) {
-    console.error("Failed to fetch product:", error);
-  }
-
-  return {
-    props: {
-      product,
-    },
-  };
-}
 
 export default ProductDetail;
