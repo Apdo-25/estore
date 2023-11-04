@@ -28,8 +28,8 @@ const mapSessionToUser = (sessionUser: any): User => {
   return {
     id: sessionUser.id || '', // Assume there's an id in session user, adjust if different
     email: sessionUser.email,
-    firstName: sessionUser.name?.split(' ')[0] || '',
-    lastName: sessionUser.name?.split(' ')[1] || '',
+    firstName: sessionUser.firstName || '',
+    lastName: sessionUser.lastName|| '',
     role: 'user' // Assume a default role, adjust if you have roles in session
   };
 }
@@ -61,24 +61,35 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     },
     register: async (data) => {
       try {
-        const response = await fetch('/api/users/register', {
+        const response = await fetch('/api/users/register', { // Make sure this matches your signup API endpoint
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(data),
         });
-
+  
         const returnedData = await response.json();
-        
-        if (response.status !== 201) throw new Error(returnedData.error);
-
-        setUser(returnedData.user);
-        router.push('/login');
+  
+        if (response.status !== 201) {
+          throw new Error(returnedData.message || 'Error during registration');
+        }
+  
+        // Assuming the user should be automatically logged in after registration
+        // This part might vary depending on how you handle sessions after registration
+        await signIn('credentials', {
+          redirect: false,
+          email: data.email,
+          password: data.password,
+        });
+  
+        // setUser(returnedData.user); No need to set the user here if signIn will create the session and useEffect will catch it
+  
+        router.push('/profile'); // or wherever you want to redirect the user after registration
       } catch (error) {
         console.error("Error during registration:", error);
       }
-    },
+    }
   }), [user, router]);
 
   return (

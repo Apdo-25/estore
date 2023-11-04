@@ -19,6 +19,7 @@ import { useUser } from "@/context/UserContext";
 
 const Login = () => {
   const { login } = useUser(); // Destructure login function
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const toast = useToast();
@@ -26,9 +27,11 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!email || !password) {
       toast({ description: "Please fill in all fields.", status: "warning" });
+      setLoading(false);
       return;
     }
 
@@ -37,6 +40,7 @@ const Login = () => {
       toast({ description: "Login successful!", status: "success" });
       router.push("/");
     } catch (error) {
+      setLoading(false);
       toast({
         description: error.message || "Login failed. Please try again.",
         status: "error",

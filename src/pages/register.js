@@ -23,7 +23,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
-  const { setUser } = useUser();
+  const { register } = useUser(); // Use the register function from the context
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -32,48 +32,39 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (!email || !password || !firstName) {
+    if (!email || !password || !firstName || !lastName) {
+      // Added lastName to the check
       toast({
         description: "Please fill in all required fields.",
         status: "warning",
+        duration: 3000,
+        isClosable: true,
       });
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await fetch("/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, firstName, lastName }),
+      // Use the register function from the context
+      await register({ email, password, firstName, lastName });
+
+      toast({
+        description: "Registration successful! Logging you in...",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
 
-      const data = await response.json();
-      setLoading(false);
-
-      if (response.ok) {
-        setUser(data.user);
-        toast({
-          description: "Registration successful!",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        setTimeout(() => {
-          router.push("/");
-        }, 3200);
-      } else {
-        toast({
-          description: data.message || "Registration failed.",
-          status: "error",
-        });
-      }
+      router.push("/");
     } catch (error) {
       setLoading(false);
       toast({
-        description: "Registration failed. Please try again.",
+        description: error.message || "Registration failed. Please try again.",
         status: "error",
+        duration: 5000,
+        isClosable: true,
       });
     }
   };
@@ -144,6 +135,7 @@ const Register = () => {
           </FormControl>
           <Stack spacing={10} pt={2}>
             <Button
+              isLoading={loading}
               loadingText="Submitting"
               size="lg"
               bg={"blue.400"}

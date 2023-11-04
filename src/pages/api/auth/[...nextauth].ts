@@ -48,7 +48,6 @@ export default NextAuth({
     }),
   ],
   adapter: PrismaAdapter(prisma),
-
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
@@ -70,6 +69,9 @@ export default NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+        token.role = user.role;
       }
       return token;
     },
@@ -82,6 +84,7 @@ export default NextAuth({
           firstName: token.firstName,
           lastName: token.lastName,
           email: token.email,
+          role: token.role,
         },
       };
     },

@@ -4,7 +4,6 @@ import {
   Button,
   Flex,
   Stack,
-  VStack,
   Text,
   useColorMode,
   useColorModeValue,
@@ -13,11 +12,12 @@ import {
   ModalOverlay,
   ModalContent,
   ModalCloseButton,
-  Icon,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
+  Icon,
+  VStack,
 } from "@chakra-ui/react";
 import {
   MoonIcon,
@@ -26,17 +26,18 @@ import {
   CloseIcon,
   AtSignIcon,
 } from "@chakra-ui/icons";
-import { useRouter } from "next/router";
 import { CartIcon } from "./CartIcon";
 import Link from "next/link";
 import { FiUser } from "react-icons/fi";
 import { useUser } from "../context/UserContext";
+import { useRouter } from "next/router";
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { user, logout } = useUser(); // Extract user and logout function from UserContext
+  const router = useRouter();
   const bg = useColorModeValue("white", "gray.800");
   const color = useColorModeValue("gray.800", "white");
   const borderColor = useColorModeValue("gray.200", "gray.900");
@@ -45,13 +46,13 @@ const Header = () => {
     setIsClient(true);
   }, []);
 
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
+  const handleLogout = async () => {
+    logout();
+    router.push("/login"); // Redirect to login page after logout
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   if (!isClient) {
     return null; // or a placeholder if you prefer
@@ -84,8 +85,13 @@ const Header = () => {
           </Link>
         </Flex>
 
-        <Link href={"/Product/AllProducts"} onClick={closeMobileMenu}>
-          <Text fontSize={"m"} fontWeight={600}>
+        <Link href={"/Product/AllProducts"}>
+          <Text
+            fontSize={"m"}
+            fontWeight={600}
+            as={"a"}
+            onClick={closeMobileMenu}
+          >
             Browse Watches
           </Text>
         </Link>
@@ -122,7 +128,7 @@ const Header = () => {
                 variant="ghost"
               />
               <MenuList>
-                <MenuItem onClick={() => logout()}>Log Out</MenuItem>
+                <MenuItem onClick={handleLogout}>Log Out</MenuItem>
                 <Link href="/Profile">
                   <MenuItem>Profile</MenuItem>
                 </Link>
