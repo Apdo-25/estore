@@ -1,5 +1,5 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { CartProvider } from "../context/CartContext";
+
 import { UserProvider } from "@/context/UserContext";
 import { ProductProvider } from "@/context/ProductContext";
 import Layout from "@/components/Layout";
@@ -18,11 +18,9 @@ export default function App({ Component, pageProps }) {
       <SessionProvider session={pageProps.session}>
         <UserProvider>
           <ProductProvider>
-            <CartProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </CartProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
           </ProductProvider>
         </UserProvider>
       </SessionProvider>
