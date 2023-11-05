@@ -22,7 +22,7 @@ const CartPage = () => {
   if (error) return <Box>{error}</Box>;
 
   // Ensure you are accessing the `items` property of `cart`
-  if (!cart || cart.items.length === 0) {
+  if (!cart || !cart.items || cart.items.length === 0) {
     return (
       <Box mx="auto" py="12">
         Your cart is empty.

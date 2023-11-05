@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { Product } from '@prisma/client';
-import { CartItem } from '@prisma/client';
 
-
+interface CartItem {
+  id: string;
+  productId: string;
+  quantity: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface Cart {
   id: string;
@@ -19,11 +23,13 @@ interface CartProviderProps {
 }
 
 interface CartContextState {
-  cart: Cart | null;
-  fetchCart: () => Promise<void>;
-  addItemToCart: (productId: string, quantity: number) => Promise<void>;
-  removeItemFromCart: (itemId: string) => Promise<void>;
-}
+    cart: Cart | null;
+    loading: boolean;
+    error: string | null;
+    fetchCart: () => Promise<void>;
+    addItemToCart: (productId: string, quantity: number) => Promise<void>;
+    removeItemFromCart: (cartItemId: string) => Promise<void>;
+  }
 
 const CartContext = createContext<CartContextState | undefined>(undefined);
 
@@ -35,14 +41,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const fetchCart = useCallback(async () => {
     if (!session?.user) {
-      console.error('User is not authenticated.');
       setError('User is not authenticated.');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/cart/${session.user.id}`);
+      const res = await fetch(`/api/cart/${encodeURIComponent(session.user.id)}`);
       if (!res.ok) {
         throw new Error('Failed to fetch cart');
       }
@@ -56,19 +61,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [session?.user]);
 
   const addItemToCart = useCallback(async (productId: string, quantity: number) => {
-    if (!session?.user || !cart) {
-      setError('User is not authenticated or cart is not initialized.');
+    if (!session?.user) {
+      setError('User is not authenticated.');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/cart/${cart.id}/items`, {
+      const res = await fetch(`/api/cart/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productId, quantity }),
+        body: JSON.stringify({ userId: session.user.id, productId, quantity }),
       });
 
       if (!res.ok) {
@@ -80,20 +85,24 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session?.user, cart, fetchCart]);
+  }, [session?.user, fetchCart]);
 
-  const removeItemFromCart = useCallback(async (itemId: string) => {
-    if (!session?.user || !cart) {
-      setError('User is not authenticated or cart is not initialized.');
+  const removeItemFromCart = useCallback(async (cartItemId : string) => {
+    if (!session?.user) {
+      setError('User is not authenticated.');
       return;
     }
-  
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/cart/${cart.id}/items?itemId=${itemId}`, { // Corrected endpoint
+      const res = await fetch(`/api/cart/remove`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cartItemId  }),
       });
-  
+
       if (!res.ok) {
         throw new Error('Failed to remove item from cart');
       }
@@ -103,8 +112,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [session?.user, cart, fetchCart]);
-  
+  }, [session?.user, fetchCart]);
 
   useEffect(() => {
     if (session?.user) {

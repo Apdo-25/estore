@@ -11,8 +11,9 @@ export const CartIcon = () => {
   const fontColor = { light: "gray.800", dark: "gray.100" };
 
   // Determine the count of items in the cart
-  const itemCount =
-    cart?.items.reduce((count, item) => count + item.quantity, 0) ?? 0;
+  const itemCount = Array.isArray(cart?.items)
+    ? cart.items.reduce((count, item) => count + item.quantity, 0)
+    : 0;
 
   return (
     <Box position={"relative"} animation={itemCount > 0 ? "bounce 0.6s 2" : ""}>

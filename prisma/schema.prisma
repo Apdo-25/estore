@@ -61,7 +61,7 @@ enum Role {
 
 model Cart {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String     @db.ObjectId
+  userId     String     @unique @db.ObjectId
   user       User       @relation(fields: [userId], references: [id])
   items      CartItem[]
   totalPrice Float      @default(0)
