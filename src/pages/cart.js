@@ -13,9 +13,9 @@ import { CartItem } from "@/components/cartpage/CartItem";
 import { CartOrderSummary } from "@/components/cartpage/CartOrderSummary";
 
 const CartPage = () => {
-  const { cart } = useCart();
+  const { cartItems } = useCart();
 
-  if (cart.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <Box mx="auto" py="12">
         Your cart is empty.
@@ -41,8 +41,9 @@ const CartPage = () => {
           </Heading>
 
           <Stack spacing="6">
-            {cart.items &&
-              cart.items.map((item) => <CartItem key={item.id} item={item} />)}
+            {cartItems.map((item) => (
+              <CartItem key={item.id} item={item} />
+            ))}
           </Stack>
         </Stack>
 

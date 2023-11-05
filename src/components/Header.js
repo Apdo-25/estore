@@ -85,7 +85,7 @@ const Header = () => {
           </Link>
         </Flex>
 
-        <Link href={"/Product/AllProducts"}>
+        <Link href={"/Product/AllProducts"} passHref>
           <Text
             fontSize={"m"}
             fontWeight={600}

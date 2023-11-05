@@ -26,7 +26,7 @@ export default NextAuth({
         console.error("Authorization error:");
 
         if (!user) {
-          return null; // Instead of throwing, return null to indicate failure
+          return null; // User not found
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -35,7 +35,7 @@ export default NextAuth({
         );
 
         if (!isPasswordValid) {
-          return null; // As above, return null for NextAuth to handle the error
+          return null; // Invalid password
         }
 
         // Safe user object for the token without the password

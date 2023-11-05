@@ -27,7 +27,7 @@ export const ProductCard = (props) => {
 
   const toast = useToast();
 
-  const { addItem } = useCart();
+  const { addCartItem } = useCart();
 
   return (
     <Stack
@@ -83,7 +83,7 @@ export const ProductCard = (props) => {
           colorScheme="blue"
           width="full"
           onClick={() => {
-            addItem(product.id, 1);
+            addCartItem(product.id, 1);
             toast({
               title: "Item Added",
               description: `${product.name} has been added to the cart.`,
