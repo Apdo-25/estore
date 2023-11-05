@@ -1,20 +1,21 @@
-import React, { useContext } from "react";
-import { useColorMode, IconButton, Box, Text } from "@chakra-ui/react";
-import { useCart } from "../context/CartContext";
+import React from "react";
+import { useColorMode, IconButton, Box } from "@chakra-ui/react";
 import { FiShoppingCart } from "react-icons/fi";
+import { useCart } from "@/context/CartContext";
 
 export const CartIcon = () => {
-  const { cart } = useCart();
   const { colorMode } = useColorMode();
+  const { cart } = useCart(); // Use the custom hook to get cart context
 
   const iconColor = { light: "gray.600", dark: "gray.300" };
   const fontColor = { light: "gray.800", dark: "gray.100" };
 
+  // Determine the count of items in the cart
+  const itemCount =
+    cart?.items.reduce((count, item) => count + item.quantity, 0) ?? 0;
+
   return (
-    <Box
-      position={"relative"}
-      animation={cart && cart.length > 0 ? "bounce 0.6s 2" : ""}
-    >
+    <Box position={"relative"} animation={itemCount > 0 ? "bounce 0.6s 2" : ""}>
       <IconButton
         icon={<FiShoppingCart />}
         aria-label="Cart"
@@ -29,7 +30,7 @@ export const CartIcon = () => {
         }}
         transition="all 0.3s"
       />
-      {cart && cart.length > 0 && (
+      {itemCount > 0 && (
         <Box
           position={"absolute"}
           top={"-2px"}
@@ -41,13 +42,14 @@ export const CartIcon = () => {
           fontSize={"xs"}
           fontWeight={"bold"}
         >
-          {cart.length}
+          {itemCount}
         </Box>
       )}
     </Box>
   );
 };
 
+// The Global styles for the animation can stay as they are
 import { Global, css } from "@emotion/react";
 
 const bounceAnimation = css`

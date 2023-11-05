@@ -28,7 +28,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { fetchProductById, error } = useProducts(); // Use fetchProductById from context
   const [product, setProduct] = useState(null);
-  const { addCartItem } = useCart();
+  const { addItemToCart } = useCart();
 
   useEffect(() => {
     if (id) {
@@ -126,7 +126,7 @@ const ProductDetail = () => {
               boxShadow: "lg",
             }}
             onClick={() => {
-              addCartItem(product.id, 1);
+              addItemToCart(product.id, 1);
               toast({
                 title: "Item Added",
                 description: `${product.name} has been added to the cart.`,

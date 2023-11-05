@@ -9,7 +9,8 @@ import {
   CloseButton,
   useToast
 } from "@chakra-ui/react";
-import { CartContext } from "../context/CartContext";
+import {useCart} from "@/context/CartContext"
+
 
 type ProductType = {
   imageUrl: string;
@@ -26,19 +27,29 @@ type CartItemType = {
 
 export const CartItem = ({ item }: { item: CartItemType }) => {
   const { quantity, product } = item;
-  const { RemoveItem } = useContext(CartContext);
+  const { removeItemFromCart } = useCart(); // Use the custom hook to get cart manipulation functions
   const toast = useToast();
   const { imageUrl, name, price, currency } = product;
 
-  const handleRemove = () => {
-    RemoveItem(item.id);
-    toast({
-      title: "Item Removed",
-      description: `${name} has been removed from the cart.`,
-      status: "info",
-      duration: 1000,
-      isClosable: true,
-    });
+  const handleRemove = async () => {
+    try {
+      await removeItemFromCart(item.id);
+      toast({
+        title: "Item Removed",
+        description: `${name} has been removed from the cart.`,
+        status: "info",
+        duration: 1000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was a problem removing the item from the cart.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
 

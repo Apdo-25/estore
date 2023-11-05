@@ -1,5 +1,4 @@
 import React from "react";
-import { useCart } from "@/context/CartContext";
 import {
   Box,
   Flex,
@@ -9,13 +8,21 @@ import {
   Stack,
   useColorModeValue as mode,
 } from "@chakra-ui/react";
-import { CartItem } from "@/components/cartpage/CartItem";
+import { CartItem as CartItemComponent } from "@/components/cartpage/CartItem";
 import { CartOrderSummary } from "@/components/cartpage/CartOrderSummary";
+import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/router";
 
 const CartPage = () => {
-  const { cartItems } = useCart();
+  const { cart, loading, error } = useCart();
+  const router = useRouter();
+  const { id } = router.query;
 
-  if (cartItems.length === 0) {
+  if (loading) return <Box>Loading...</Box>;
+  if (error) return <Box>{error}</Box>;
+
+  // Ensure you are accessing the `items` property of `cart`
+  if (!cart || cart.items.length === 0) {
     return (
       <Box mx="auto" py="12">
         Your cart is empty.
@@ -37,12 +44,12 @@ const CartPage = () => {
       >
         <Stack spacing={{ base: "8", md: "10" }} flex="2">
           <Heading fontSize="2xl" fontWeight="extrabold">
-            Shopping Cart (3 items)
+            Shopping Cart ({cart.items.length} items)
           </Heading>
 
           <Stack spacing="6">
-            {cartItems.map((item) => (
-              <CartItem key={item.id} item={item} />
+            {cart.items.map((item) => (
+              <CartItemComponent key={item.id} item={item} />
             ))}
           </Stack>
         </Stack>
