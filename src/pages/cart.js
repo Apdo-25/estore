@@ -7,6 +7,7 @@ import {
   Link,
   Stack,
   useColorModeValue as mode,
+  CircularProgress,
 } from "@chakra-ui/react";
 import { CartItem as CartItemComponent } from "@/components/cartpage/CartItem";
 import { CartOrderSummary } from "@/components/cartpage/CartOrderSummary";
@@ -16,10 +17,18 @@ import { useRouter } from "next/router";
 const CartPage = () => {
   const { cart, loading, error } = useCart();
   const router = useRouter();
-  const { id } = router.query;
-
-  if (loading) return <Box>Loading...</Box>;
-  if (error) return <Box>{error}</Box>;
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minH="60vh"
+      >
+        <CircularProgress s isIndeterminate />
+      </Box>
+    );
+  }
 
   // Ensure you are accessing the `items` property of `cart`
   if (!cart || !cart.items || cart.items.length === 0) {

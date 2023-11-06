@@ -16,6 +16,7 @@ type ProductType = {
   imageUrl: string;
   name: string;
   price: number;
+  salePrice: number;
   currency: string;
 };
 
@@ -29,7 +30,7 @@ export const CartItem = ({ item }: { item: CartItemType }) => {
   const { quantity, product } = item;
   const { removeItemFromCart } = useCart(); // Use the custom hook to get cart manipulation functions
   const toast = useToast();
-  const { imageUrl, name, price, currency } = product;
+  const { imageUrl, name, salePrice, currency } = product;
 
   const handleRemove = async () => {
     try {
@@ -99,7 +100,7 @@ export const CartItem = ({ item }: { item: CartItemType }) => {
               fontWeight="medium"
               fontSize="sm"
             >
-              {currency} {price}
+              {currency} {salePrice}
             </Text>
           </Stack>
           <Stack direction="row" spacing={4} alignItems="center">

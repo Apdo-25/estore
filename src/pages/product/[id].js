@@ -113,18 +113,8 @@ const ProductDetail = () => {
             ))}
           </List>
           <Button
-            rounded={"none"}
-            w={"full"}
-            mt={8}
-            size={"lg"}
-            py={"7"}
-            bg={"gray.900"}
-            color={"white"}
-            textTransform={"uppercase"}
-            _hover={{
-              transform: "translateY(2px)",
-              boxShadow: "lg",
-            }}
+            colorScheme="blue"
+            width="full"
             onClick={() => {
               addItemToCart(product.id, 1);
               toast({

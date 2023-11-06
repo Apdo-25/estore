@@ -1,6 +1,18 @@
-// Inside your add.ts file
 import prisma from "@/utils/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
+
+// Helper function to calculate total price
+async function calculateTotalPrice(cartId) {
+  const cartItems = await prisma.cartItem.findMany({
+    where: { cartId },
+    include: { product: true },
+  });
+  return cartItems.reduce((total, item) => {
+    return (
+      total + (item.product.salePrice || item.product.price) * item.quantity
+    );
+  }, 0);
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,12 +22,17 @@ export default async function handler(
     const { userId, productId, quantity } = req.body;
 
     try {
-      // Check if the cart exists
       let cart = await prisma.cart.findFirst({
         where: { userId },
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
+          },
+        },
       });
 
-      // If the cart doesn't exist, create a new one
       if (!cart) {
         cart = await prisma.cart.create({
           data: {
@@ -25,11 +42,14 @@ export default async function handler(
             },
           },
           include: {
-            items: true,
+            items: {
+              include: {
+                product: true, // This line ensures that the product info is included
+              },
+            },
           },
         });
       } else {
-        // If the cart exists, add the new item or update the quantity
         const existingItem = await prisma.cartItem.findFirst({
           where: {
             cartId: cart.id,
@@ -38,7 +58,6 @@ export default async function handler(
         });
 
         if (existingItem) {
-          // Update the existing cart item quantity
           await prisma.cartItem.update({
             where: {
               id: existingItem.id,
@@ -48,7 +67,6 @@ export default async function handler(
             },
           });
         } else {
-          // Create a new cart item
           await prisma.cartItem.create({
             data: {
               cartId: cart.id,
@@ -59,8 +77,16 @@ export default async function handler(
         }
       }
 
-      // Return the updated cart
-      return res.status(200).json(cart);
+      // Calculate the new total price
+      const totalPrice = await calculateTotalPrice(cart.id);
+
+      // Update the cart with the new total price
+      const updatedCart = await prisma.cart.update({
+        where: { id: cart.id },
+        data: { totalPrice },
+      });
+
+      return res.status(200).json(updatedCart);
     } catch (error) {
       return res
         .status(500)
