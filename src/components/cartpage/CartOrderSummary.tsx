@@ -1,4 +1,4 @@
-"use client"
+
 import {
   Button,
   Flex,
@@ -59,8 +59,7 @@ export const CartOrderSummary = () => {
       }
 
       const data = await response.json();
-      
-      router.push(data.checkoutUrl); 
+      router.push(data.checkoutUrl);
     } catch (error) {
       toast({
         title: 'Error',
