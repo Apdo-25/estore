@@ -1,3 +1,4 @@
+import type { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { v4 as uuidv4 } from "uuid";
@@ -6,7 +7,8 @@ import prisma from "@/utils/prisma";
 import bcrypt from "bcrypt";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -49,7 +51,6 @@ export default NextAuth({
       },
     }),
   ],
-  adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
@@ -105,4 +106,6 @@ export default NextAuth({
       return session;
     },
   },
-});
+};
+
+export default NextAuth(authOptions);

@@ -1,3 +1,4 @@
+"use client";
 import {
   Box,
   Button,
@@ -97,8 +98,10 @@ const ProductDetail = () => {
                   <chakra.span
                     textDecoration={"line-through"}
                     color={"gray.500"}
+                    ml={2}
                   >
-                    {product.currency} {product.salePrice}
+                    {product.currency}
+                    {product.salePrice}
                   </chakra.span>
                 </>
               )}

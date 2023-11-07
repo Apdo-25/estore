@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -9,6 +10,7 @@
       "./types",
       "./node_modules/@types"
     ],
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -31,8 +33,6 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/pages/cart.js",
-    "src/context/CartContext.js"
   ],
   "exclude": [
     "node_modules"

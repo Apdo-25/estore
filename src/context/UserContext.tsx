@@ -102,8 +102,32 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         console.error("Error during registration:", error);
         return 'Error during registration';
       }
-    }
+    },
+
+    //update user
+    updateUser: async (id, userData) => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`/api/users/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        });
+        if (!res.ok) throw new Error('Failed to update user');
+
+      } catch (error) {
+        setIsLoading(false);
+        console.error("Error during registration:", error);
+        return 'Error during registration';
+      }
+    },
+
+    
   }), [user, isAdmin, isLoading, router]);
+
+
 
   return (
     <UserContext.Provider value={contextValue}>
