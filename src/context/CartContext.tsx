@@ -29,6 +29,7 @@ interface CartContextState {
     fetchCart: () => Promise<void>;
     addItemToCart: (productId: string, quantity: number) => Promise<void>;
     removeItemFromCart: (cartItemId: string) => Promise<void>;
+    clearCart: () => void;
   }
 
 const CartContext = createContext<CartContextState | undefined>(undefined);
@@ -45,6 +46,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       return;
     }
 
+    
     setLoading(true);
     try {
       const res = await fetch(`/api/cart/${encodeURIComponent(session.user.id)}`);
@@ -114,11 +116,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   }, [session?.user, fetchCart]);
 
+  const clearCart = useCallback(() => {
+    setCart(null);
+  }, []);
+
   useEffect(() => {
     if (session?.user) {
       fetchCart().catch(console.error);
     }
+
+    
   }, [session?.user, fetchCart]);
+
+
 
   const contextValue = {
     cart,
@@ -127,6 +137,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     fetchCart,
     addItemToCart,
     removeItemFromCart,
+    clearCart
   };
 
   return (
