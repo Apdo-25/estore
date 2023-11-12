@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { Input, Button, Box } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 
-const SearchBar = () => {
+export default function SearchBar() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -48,6 +48,4 @@ const SearchBar = () => {
       </Button>
     </Box>
   );
-};
-
-export default SearchBar;
+}

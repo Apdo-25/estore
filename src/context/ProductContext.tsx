@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback,useMemo  } from 'react';
 import { useUser } from './UserContext';
-
 
 type ProductType = {
   id: string;
@@ -27,7 +26,6 @@ interface ProductContextType {
   }
   
   
-
 const ProductContext = createContext<ProductContextType | null>(null);
   
   
@@ -40,29 +38,42 @@ export const useProducts = () => {
   };
 
   export const ProductProvider = ({ children }) => {
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const { user, isAdmin } = useUser(); 
+    const [state, setState] = useState({
+      products: [],
+      error: null,
+      totalPages: 0,
+      currentPage: 1,
+    });
+    const { isAdmin } = useUser();
 
 
+  // Helper functions to update state
+  const setError = (error) => setState((prevState) => ({ ...prevState, error }));
+  const setProducts = (products) => setState((prevState) => ({ ...prevState, products }));
+  const setTotalPages = (totalPages) => setState((prevState) => ({ ...prevState, totalPages }));
+  const setCurrentPage = (currentPage) => setState((prevState) => ({ ...prevState, currentPage }));
 
   // Fetch products with pagination
-  const fetchProducts = async (page = 1, limit = 10) => {
+  const fetchProducts = useCallback(async (page = 1, limit = 10) => {
+    setError(null);
     try {
       const res = await fetch(`/api/products?page=${page}&limit=${limit}`);
-      if (!res.ok) throw new Error('Failed to fetch products');
-
-      const { data, totalPages: total, currentPage: current } = await res.json();
-      setProducts(data);
-      setTotalPages(total);
-      setCurrentPage(current);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to fetch products');
+      }
+  
+      const { data, totalPages: total } = await res.json();
+      setState(prevState => ({
+        ...prevState,
+        products: data,
+        totalPages: total,
+        currentPage: page // Set the page from the parameter, not the response
+      }));
     } catch (err) {
       setError(err.message);
     }
-  };
-
+  }, []);
   // Fetch a single product by ID
   const fetchProductById = async (id) => {
     try {
@@ -78,7 +89,7 @@ export const useProducts = () => {
 
   // Create a new product
   const createProduct = async (productData) => {
-   if (!isAdmin) { // Checking if the user is an admin before allowing the creation
+    if (!isAdmin) {
       setError('Only admins can create a new product.');
       return;
     }
@@ -91,9 +102,9 @@ export const useProducts = () => {
         body: JSON.stringify(productData),
       });
       if (!res.ok) throw new Error('Failed to create product');
-
+  
       const newProduct = await res.json();
-      setProducts([...products, newProduct]);
+      setProducts([...state.products, newProduct]); // Changed products to state.products
     } catch (err) {
       setError(err.message);
     }
@@ -101,10 +112,10 @@ export const useProducts = () => {
 
   // Update an existing product
   const updateProduct = async (id, productData) => {
-    if (!isAdmin) { // Checking if the user is an admin before allowing the creation
-        setError('Only admins can create a new product.');
-        return;
-      }
+    if (!isAdmin) {
+      setError('Only admins can update a product.');
+      return;
+    }
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: 'PUT',
@@ -114,9 +125,9 @@ export const useProducts = () => {
         body: JSON.stringify(productData),
       });
       if (!res.ok) throw new Error('Failed to update product');
-
+  
       const updatedProduct = await res.json();
-      setProducts(products.map((p) => (p.id === id ? updatedProduct : p)));
+      setProducts(state.products.map((p) => (p.id === id ? updatedProduct : p))); // Changed products to state.products
     } catch (err) {
       setError(err.message);
     }
@@ -124,36 +135,33 @@ export const useProducts = () => {
 
   // Delete a product from the database
   const deleteProduct = async (id) => {
-    if (!isAdmin) { // Checking if the user is an admin before allowing the creation
-        setError('Only admins can create a new product.');
-        return;
-      }
+    if (!isAdmin) {
+      setError('Only admins can delete a product.');
+      return;
+    }
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete product');
-
-      setProducts(products.filter((p) => p.id !== id));
+  
+      setProducts(state.products.filter((p) => p.id !== id)); // Changed products to state.products
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const value = {
-    products,
-    error,
-    totalPages,
-    currentPage,
+ const contextValue = useMemo(() => ({
+    ...state,
     fetchProducts,
     fetchProductById,
     createProduct,
     updateProduct,
     deleteProduct,
-  };
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [state, isAdmin]); 
   return (
-    <ProductContext.Provider value={value}>
+    <ProductContext.Provider value={contextValue}>
       {children}
     </ProductContext.Provider>
   );

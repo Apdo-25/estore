@@ -1,3 +1,4 @@
+"use client";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { UserProvider } from "@/context/UserContext";
 import { ProductProvider } from "@/context/ProductContext";

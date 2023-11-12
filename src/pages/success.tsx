@@ -1,3 +1,4 @@
+"use client";
 import { Box, Heading, Text, Button, VStack, useColorModeValue } from '@chakra-ui/react';
 import { CheckCircleIcon } from '@chakra-ui/icons';
 import Link from 'next/link';

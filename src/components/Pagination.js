@@ -1,4 +1,5 @@
-import { Box, Button, Flex, Text, IconButton } from "@chakra-ui/react";
+"use client";
+import { Flex, Text, IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 const Pagination = ({ totalPages, currentPage, onPageChange }) => {

@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import Footer from "./Footer";

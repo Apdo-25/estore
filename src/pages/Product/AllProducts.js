@@ -1,3 +1,4 @@
+"use client";
 import { Box, CircularProgress, useToast } from "@chakra-ui/react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGrid } from "@/components/ProductGrid";

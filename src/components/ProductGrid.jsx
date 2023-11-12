@@ -1,3 +1,4 @@
+"use client";
 import { SimpleGrid } from "@chakra-ui/react";
 import { Children, isValidElement, useMemo } from "react";
 

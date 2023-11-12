@@ -1,3 +1,4 @@
+"use client";
 import { HStack, Text, useColorModeValue as mode } from "@chakra-ui/react";
 export function formatPrice(value, opts = {}) {
   const { locale = "dk", currency = "DKK" } = opts;

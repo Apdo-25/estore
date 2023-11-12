@@ -1,3 +1,4 @@
+"use client";
 import { Icon, IconButton, LightMode } from "@chakra-ui/react";
 import { FiHeart } from "react-icons/fi";
 

@@ -1,3 +1,4 @@
+"use client";
 import { HStack, Icon, useColorModeValue } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 

@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@chakra-ui/react";
 
 const ProductBadge = ({ flag }) => {
